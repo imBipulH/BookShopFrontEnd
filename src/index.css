@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.embla {
+  overflow: hidden;
+}
+.embla__container {
+  display: flex;
+}
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+.embla__slide__category {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+/* Sidebar Start */
+
+.content-wrapper {
+  display: flex;
+  gap: 1rem;
+  overflow-x: hidden;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0; /* Sidebar sticks to the top when scrolling */
+  height: calc(100vh - 1rem); /* Optional: Adjust height */
+  overflow-y: auto; /* Sidebar can scroll if content exceeds height */
+}
+
+.main-content {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.no-spinner {
+  -webkit-appearance: none; /* Hides spinners in Chrome, Safari */
+  -moz-appearance: textfield; /* Hides spinners in Firefox */
+  appearance: textfield; /* Standard */
+}
+
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none; /* Hides spinners in Chrome, Safari */
+  margin: 0; /* Removes default margin */
+}
+
