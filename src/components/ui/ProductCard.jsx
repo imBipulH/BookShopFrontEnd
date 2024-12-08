@@ -13,11 +13,11 @@ const ProductCard = ({
       <div
         className={`bg-white rounded-md p-2 max-w-60 sm:w-52 border cursor-pointer group relative ${className}`}
       >
-        <div className=' bg-white h-36 overflow-hidden relative'>
-          <div className='flex justify-center w-full bg-red-300'>
+        <div className=' bg-sky-50 hover:shadow-md h-36 overflow-hidden relative'>
+          <div className='flex justify-center h-full w-full '>
             <img
-              className='h-full group-hover:scale-110 transition-all duration-300  object-cover'
-              src='https://via.placeholder.com/200x200'
+              className='h-full group-hover:scale-110 transition-all duration-300'
+              src='../../../src/assets/taylor-heery-KPlmk0u5flA-unsplash.jpg'
               alt='Product Image'
             />
           </div>
@@ -37,7 +37,7 @@ const ProductCard = ({
             </button>
           </div>
         </div>
-        <div className=' bg-sky-50'>
+        <div className=' bg-white'>
           <div className='h-20'>
             <h3 className='text-base my-2 line-clamp-2 text-ellipsis'>
               {names}

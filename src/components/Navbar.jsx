@@ -128,7 +128,8 @@ const Navbar = () => {
           ></div>
         )}
 
-        <div className='bg-sky-50 py-2 hidden md:block relative'>
+        {/* Categories on navbar (Desktop Only) */}
+        <div className='bg-white py-2 hidden md:block relative'>
           <div className='flex items-center px-6'>
             <button
               onClick={() => scrollCategories('left')}

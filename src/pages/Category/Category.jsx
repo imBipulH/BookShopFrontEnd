@@ -69,7 +69,7 @@ const Category = () => {
                 <h1 className='text-2xl font-semibold'>Story</h1>
                 <p>(Showing 1 to 60 of 10000 items)</p>
               </div>
-              <div className='hidden md:flex items-center gap-4'>
+              <div className='hidden md:flex items-center gap-4 pr-6'>
                 <div className='flex items-center gap-1 '>
                   <BsSortUpAlt className='mt-[2px]' />
                   <p>Sort By:</p>
@@ -136,13 +136,15 @@ const Category = () => {
           onClick={e => handleOutsideClick(e, setIsFilterOpen)}
         >
           <div
-            className='bg-white rounded-lg p-6 w-full h-5/6 max-w-sm overflow-y-scroll  '
+            className='bg-white rounded-lg p- w-full h-[85%] overflow-y-scroll relative '
             onClick={e => e.stopPropagation()} // Prevent modal close on content click
           >
-            <h2 className='text-lg w-full font-semibold mb-4 text-center bg-white '>
+            <h2 className='text-lg w-full font-semibold mb-4 text-center bg-white fixed py-2 border-b border-b-gray-300 flex justify-center items-center gap-2'>
+              <LuListFilter />
               Filter Options
             </h2>
-            <div className='flex flex-col gap-2 items-center'>
+
+            <div className='flex flex-col gap-2 pt-12 items-center'>
               <SelectFilter title='Categories' options={categories} />
               <SelectFilter title='Authors' options={authors} />
               <SelectFilter title='Publishers' options={publishers} />
