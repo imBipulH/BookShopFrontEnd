@@ -1,18 +1,33 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AddressModal } from '../../components/ui/checkout/SaveAddress'
 import { Link } from 'react-router-dom'
+import { IoLocationOutline } from 'react-icons/io5'
+import { useDispatch, useSelector } from 'react-redux'
+import { getAddresses, selectAddresses } from '../../store/shop/addressSlice'
+import AddressDropdown from '../../components/ui/checkout/AddressDropodown'
 
 const CheckoutPage = () => {
+  const dispatch = useDispatch()
+  const [selectedAddressId, setSelectedAddressId] = useState('')
   const [selectedAddress, setSelectedAddress] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const savedAddresses = [
-    'John Doe, 123 Street, City, Country',
-    'Jane Smith, 456 Avenue, City, Country'
-  ]
+  const addresses = useSelector(selectAddresses)
 
-  const handleAddressSelect = e => {
-    setSelectedAddress(e.target.value)
+  useEffect(() => {
+    dispatch(getAddresses())
+  }, [dispatch])
+
+  const formatAddress = address => {
+    return `${address.name}, ${address.phone}, ${address.city}, ${address.country}, ${address.addressDetails}`
+  }
+
+  console.log(addresses)
+
+  const handleAddressSelect = selectedAddressId => {
+    setSelectedAddressId(selectedAddressId)
+    const addressData = addresses.find(addr => addr._id === selectedAddressId)
+    setSelectedAddress(formatAddress(addressData))
   }
 
   return (
@@ -21,19 +36,20 @@ const CheckoutPage = () => {
         {/* Address Details */}
         <div className='flex-1  address-details bg-white shadow-md p-6 rounded-md mb-6'>
           <h2 className='text-xl font-semibold mb-4'>Address Details</h2>
+
+          <div className='flex gap-2'>
+            <IoLocationOutline className='p-2 text-4xl bg-sky-200 rounded-md duration-150' />
+            <p>{selectedAddress}</p>
+          </div>
+
           <label className='block text-gray-700 mb-2'>Choose an Address:</label>
-          <select
-            className='w-full p-2 border border-gray-300 rounded-md mb-4'
-            value={selectedAddress}
-            onChange={handleAddressSelect}
-          >
-            <option value=''>Select an Address</option>
-            {savedAddresses.map((address, index) => (
-              <option key={index} value={address}>
-                {address}
-              </option>
-            ))}
-          </select>
+          <div className='App'>
+            <AddressDropdown
+              addresses={addresses}
+              selectedAddress={selectedAddressId}
+              handleAddressSelect={handleAddressSelect}
+            />
+          </div>
 
           <button
             className='bg-blue-500 text-white py-2 px-4 rounded-md'
