@@ -1,50 +1,107 @@
-import { useState } from 'react'
-import Navbar from '../../components/Navbar'
+import { useEffect, useState } from 'react'
 import Sidebar from '../../components/Sidebar'
 import ProductCard from '../../components/ui/ProductCard'
 import ReviewFilter from '../../components/ui/sidebar.ui/ReviewFilter'
 import SelectFilter from '../../components/ui/sidebar.ui/SelectFilter'
 import { BsSortDownAlt, BsSortUpAlt } from 'react-icons/bs'
 import { LuListFilter } from 'react-icons/lu'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchBooks } from '../../store/shop/bookSlice'
+import {
+  fetchAuthors,
+  fetchCategories,
+  fetchPublishers
+} from '../../store/shop/sidebarSlice'
+import { languages } from '../../components/Data'
 
-const categories = [
-  { id: 1, name: 'Fiction', parent: 'Books' },
-  { id: 2, name: 'Non-Fiction', parent: 'Books' },
-  { id: 3, name: 'Comics', parent: 'Books' },
-  { id: 4, name: 'Biography', parent: 'Books' },
-  { id: 5, name: 'Thriller', parent: 'Books' },
-  { id: 6, name: 'Romance', parent: 'Books' },
-  { id: 7, name: 'Romance', parent: 'Books' },
-  { id: 8, name: 'Romance', parent: 'Books' },
-  { id: 9, name: 'Romance', parent: 'Books' },
-  { id: 10, name: 'Romance', parent: 'Books' },
-  { id: 11, name: 'Romance', parent: 'Books' },
-  { id: 12, name: 'Romance', parent: 'Books' }
-]
-
-const authors = [
-  { id: 1, name: 'J.K. Rowling' },
-  { id: 2, name: 'George R.R. Martin' },
-  { id: 3, name: 'Agatha Christie' }
-  // ...more authors
-]
-
-const publishers = [
-  { id: 1, name: 'Penguin Random House' },
-  { id: 2, name: 'HarperCollins' },
-  { id: 3, name: 'Simon & Schuster' }
-  // ...more publishers
-]
-
-const languages = [
-  { id: 1, name: 'English' },
-  { id: 2, name: 'Spanish' },
-  { id: 3, name: 'French' }
-  // ...more languages
-]
 const Category = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isSortOpen, setIsSortOpen] = useState(false)
+
+  const dispatch = useDispatch()
+  const { books } = useSelector(state => state.books)
+  const { categories, authors, publishers } = useSelector(
+    state => state.sidebar
+  )
+
+  const [filters, setFilters] = useState(() => {
+    return (
+      JSON.parse(sessionStorage.getItem('filters')) || {
+        categories: [],
+        authors: [],
+        publishers: [],
+        languages: [],
+        sort: null,
+        sortOrder: null
+      }
+    )
+  })
+
+  useEffect(() => {
+    dispatch(fetchCategories())
+    dispatch(fetchAuthors())
+    dispatch(fetchPublishers())
+    dispatch(fetchBooks())
+  }, [dispatch])
+
+  const handleSort = event => {
+    event.preventDefault()
+    setIsSortOpen(false)
+    const value = event.target.value
+    let field
+    let order
+
+    switch (value) {
+      case 'priceLowToHigh':
+        field = 'price'
+        order = 'asc'
+        break
+      case 'priceHighToLow':
+        field = 'price'
+        order = 'desc'
+        break
+      case 'discountHighToLow':
+        field = 'discountPercentage'
+        order = 'desc'
+        break
+      case 'discountLowToHigh':
+        field = 'discountPercentage'
+        order = 'asc'
+        break
+      case 'nameAsc':
+        field = 'title'
+        order = 'asc'
+        break
+      case 'nameDesc':
+        field = 'title'
+        order = 'desc'
+        break
+      default:
+        field = 'title'
+        order = 'asc'
+    }
+
+    const existingFilters =
+      JSON.parse(sessionStorage.getItem('filters')) || filters
+
+    const updatedFilters = { ...existingFilters, sort: field, sortOrder: order }
+    setFilters(updatedFilters)
+    sessionStorage.setItem('filters', JSON.stringify(updatedFilters))
+
+    const queryParams = []
+
+    for (const key in updatedFilters) {
+      if (updatedFilters[key] && updatedFilters[key].length > 0) {
+        if (Array.isArray(updatedFilters[key])) {
+          queryParams.push(`${key}=${updatedFilters[key].join(',')}`)
+        } else {
+          queryParams.push(`${key}=${updatedFilters[key]}`)
+        }
+      }
+    }
+    const queryString = queryParams.join('&')
+    dispatch(fetchBooks(queryString))
+  }
 
   const handleOutsideClick = (event, setState) => {
     if (event.target.id === 'modal-background') {
@@ -53,10 +110,9 @@ const Category = () => {
   }
 
   return (
-    <div className='bg-gray-100 relative'>
+    <div className='bg-gray-100 relative py-4'>
       <div className='container'>
-        <Navbar />
-        <div className='flex gap-4 justify-between pt-40'>
+        <div className='flex gap-4 justify-between pt-36'>
           {/* Sidebar (Visible only on larger screens) */}
           <div className='hidden md:block min-w-64'>
             <Sidebar />
@@ -76,7 +132,7 @@ const Category = () => {
                 </div>
                 <select
                   className='border px-4 py-2 rounded'
-                  onChange={() => setIsSortOpen(false)} // Auto-close on selection
+                  onChange={e => handleSort(e)} // Auto-close on selection
                 >
                   <option value=''>Sort By</option>
                   <option value='priceLowToHigh'>Price: Low to High</option>
@@ -95,9 +151,13 @@ const Category = () => {
 
             {/* Products Grid */}
             <div className='grid grid-cols-2 gap-2 sm:flex justify-items-center sm:gap-4 flex-wrap mt-2 sm:mt-8'>
-              {[...Array(30)].map((_, index) => (
+              {/* {[...Array(30)].map((_, index) => (
                 <ProductCard key={index} />
-              ))}
+              ))} */}
+              {books.data &&
+                books.data.map((book, i) => (
+                  <ProductCard key={i} book={book} />
+                ))}
             </div>
           </div>
         </div>

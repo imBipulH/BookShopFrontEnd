@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import useEmblaCarousel from 'embla-carousel-react'
 import BannerSlider from '../../components/BannerSlider'
-import Navbar from '../../components/Navbar'
 import CategoryCard from '../../components/ui/CategoryCard'
 import { useCallback, useEffect, useState } from 'react'
 import { LeftArrow, RightArrow } from '../../components/ui/LeftArrow'
@@ -63,7 +62,6 @@ const Home = () => {
   return (
     <div className='bg-white'>
       <div className='container bg-white'>
-        <Navbar />
         <div className='pt-44 '>
           <BannerSlider />
           {categories.map((categoryGroup, index) => (

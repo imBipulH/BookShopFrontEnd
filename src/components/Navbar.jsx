@@ -1,11 +1,44 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FaBars, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 import { IoCartOutline } from 'react-icons/io5'
 import { FaRegHeart } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { GoPerson } from 'react-icons/go'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchCart } from '../store/shop/cartSlice'
+import { logout, selectUser, verifyLogin } from '../store/shop/authSlice'
+import axiosInstance from '../utils/axiosInstance'
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [logoutMenu, setLogoutMenu] = useState(false)
+  const dispatch = useDispatch()
+  const user = useSelector(selectUser)
+
+  useEffect(() => {
+    dispatch(verifyLogin())
+  }, [dispatch])
+
+  console.log(user)
+
+  useEffect(() => {
+    dispatch(fetchCart())
+  }, [dispatch])
+
+  const { cart } = useSelector(state => state.cart || []) // Fallback to empty array
+
+  const cartItemCount = cart?.reduce(
+    (total, item) => total + (item.quantity || 0),
+    0
+  )
+
+  const logoutUser = async () => {
+    try {
+      await axiosInstance.post('logout')
+      dispatch(logout())
+    } catch (error) {
+      console.error('Error during logout:', error)
+    }
+  }
 
   const categories = [
     'সকল বই',
@@ -76,17 +109,39 @@ const Navbar = () => {
             <Link to='/cart'>
               <button className='text-gray-600 pt-1 hover:text-sky-600 relative'>
                 <IoCartOutline className='text-2xl sm:text-4xl' />
-                <span className='absolute -top-1 -right-1 text-xs bg-sky-500 text-white rounded-full px-1.5'>
-                  2
+                <span className='absolute -top-1 -right-1 text-xs py-0.5 md:text-md bg-sky-500 text-white rounded-full px-1'>
+                  {cartItemCount}
                 </span>
               </button>
             </Link>
-
-            <GoPerson className='text-2xl md:hidden block sm:text-3xl cursor-pointer' />
+            <Link to='/login'>
+              <GoPerson className='text-2xl md:hidden block sm:text-3xl cursor-pointer' />
+            </Link>
             <p className='w-2 md:hidden'></p>
-            <button className='text-xs sm:text-base hidden md:block py-2 px-4 text-white bg-sky-600 rounded hover:bg-sky-700'>
-              Login / Register
-            </button>
+            {user ? (
+              <div className='relative z-50 bg-red-400'>
+                <p
+                  className='text-xs sm:text-base hidden md:block py-2 px-4 text-white bg-sky-600 rounded hover:bg-sky-700'
+                  onClick={() => {
+                    setLogoutMenu(!logoutMenu)
+                  }}
+                >{`Welcome, ${user?.firstName}`}</p>
+                {logoutMenu && (
+                  <div
+                    onClick={logoutUser}
+                    className='absolute bottom-0 top-full cursor-pointer text-xs sm:text-base hidden md:block py-2 px-4 text-white bg-sky-600 rounded hover:bg-sky-700 z-50'
+                  >
+                    Log Out
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to='/login'>
+                <button className='text-xs sm:text-base hidden md:block py-2 px-4 text-white bg-sky-600 rounded hover:bg-sky-700'>
+                  Login / Register
+                </button>
+              </Link>
+            )}
           </div>
         </div>
 

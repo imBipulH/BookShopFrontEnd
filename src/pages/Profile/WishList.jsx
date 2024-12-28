@@ -1,5 +1,4 @@
 import { TiTick } from 'react-icons/ti'
-import Navbar from '../../components/Navbar'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { IoCartOutline } from 'react-icons/io5'
 
@@ -58,7 +57,6 @@ const WishList = () => {
   return (
     <div className='bg-global_bg pt-28 md:pt-40 pb-8'>
       <div className='container'>
-        <Navbar />
         <div className=''>
           <h1 className='text-center py-2 sm:py-4 sm:text-2xl sm:font-semibold bg-sky-100'>
             My Wish List
