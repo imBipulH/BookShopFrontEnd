@@ -1,20 +1,34 @@
+/* eslint-disable react/prop-types */
 import { TiTick } from 'react-icons/ti'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { IoCartOutline } from 'react-icons/io5'
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { fetchWishlist } from '../../store/shop/wishListSlice'
 
 const WishList = () => {
-  const WishListItem = () => {
+  const dispatch = useDispatch()
+  const { items } = useSelector(state => state.wishList)
+  useEffect(() => {
+    dispatch(fetchWishlist())
+  }, [])
+  console.log('Wishlist items', items?.books)
+
+  const WishListItem = ({ book }) => {
     return (
-      <div className='flex h-fit flex-1 gap-2 md:gap-4 p-2 md:px-8 border-b border-b-primary bg-sky-50 py-2 shadow-xl'>
+      <div
+        key={book?._id}
+        className='flex h-fit flex-1 gap-2 md:gap-4 p-2 md:px-8 border-b border-b-primary bg-sky-50 py-2 shadow-xl'
+      >
         {/* <input type='checkbox' className='w-5 cursor-pointer' /> */}
-        <div className='flex items-center max-w-20 md:max-w-40'>
+        <div className='flex items-center justify-center w-20 h-24 md:h-36 md:w-28'>
           <img
-            src='https://via.placeholder.com/150x150'
-            className='max-h-28 md:max-h-40'
+            src={book?.coverImage || 'https://via.placeholder.com/150x150'}
+            className='h-full object-cover'
           />
         </div>
         <div>
-          <h2 className='text-sm md:text-xl'>Spoken English</h2>
+          <h2 className='text-sm md:text-xl'>{book?.title}</h2>
           <span className='text-xs md:text-md text-black inline mr-1'>by</span>
           <p className='text-xs md:text-base text-primary cursor-pointer inline'>
             Ashwini Shankar
@@ -62,9 +76,9 @@ const WishList = () => {
             My Wish List
           </h1>
           <div className='flex flex-col'>
-            <WishListItem />
-            <WishListItem />
-            <WishListItem />
+            {items?.books?.map(book => {
+              return <WishListItem key={book.id} book={book} />
+            })}
           </div>
         </div>
       </div>

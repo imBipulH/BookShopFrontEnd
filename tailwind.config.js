@@ -19,6 +19,9 @@ export default {
       roboto: ['Roboto', 'sans-serif', 'system-ui']
     },
     extend: {
+      fontSize: {
+        responsive: 'clamp(10px, 0.4vw, 14px)'
+      },
       colors: {
         global_bg: '#F3F4F6',
         primary: '#0ea5e9',

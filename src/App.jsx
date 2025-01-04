@@ -9,11 +9,12 @@ import WishList from './pages/Profile/WishList'
 import Registration from './pages/auth/Registration'
 import ForgetPassword from './pages/auth/ForgetPassword'
 import VerifyEmail from './pages/auth/VerifyEmail'
-import Layout from './components/Layout'
+import Layout from './components/Layouts/Layout'
 import CheckoutPage from './pages/Cart/CheckOut'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 import { verifyLogin } from './store/shop/authSlice'
+import CheckoutPage1 from './pages/Cart/Checkout[1]'
 
 function App () {
   const dispatch = useDispatch()
@@ -34,6 +35,7 @@ function App () {
         <Route path='/cart' element={<Cart />} />
         <Route path='/wish-list' element={<WishList />} />
         <Route path='/checkout' element={<CheckoutPage />} />
+        <Route path='/checkout1' element={<CheckoutPage1 />} />
       </Routes>
     </Layout>
   )

@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
-import Sidebar from '../../components/Sidebar'
+import Sidebar from '../../components/Layouts/Sidebar'
 import ProductCard from '../../components/ui/ProductCard'
-import ReviewFilter from '../../components/ui/sidebar.ui/ReviewFilter'
-import SelectFilter from '../../components/ui/sidebar.ui/SelectFilter'
 import { BsSortDownAlt, BsSortUpAlt } from 'react-icons/bs'
 import { LuListFilter } from 'react-icons/lu'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,17 +10,42 @@ import {
   fetchCategories,
   fetchPublishers
 } from '../../store/shop/sidebarSlice'
-import { languages } from '../../components/Data'
 
 const Category = () => {
+  const dispatch = useDispatch()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isSortOpen, setIsSortOpen] = useState(false)
-
-  const dispatch = useDispatch()
   const { books } = useSelector(state => state.books)
-  const { categories, authors, publishers } = useSelector(
-    state => state.sidebar
-  )
+  const { totalPages } = useSelector(state => state.books)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  console.log('totalPages: ', totalPages)
+
+  const storedFilters = JSON.parse(sessionStorage.getItem('filters')) || {}
+
+  const updatedFilters = {
+    ...storedFilters,
+    page: currentPage,
+    limit: itemsPerPage
+  }
+  sessionStorage.setItem('filters', JSON.stringify(updatedFilters))
+
+  useEffect(() => {
+    fetchBooksWithPagination()
+  }, [currentPage])
+
+  const fetchBooksWithPagination = () => {
+    console.log('updatedFilters', updatedFilters)
+
+    const queryParams = new URLSearchParams(updatedFilters).toString()
+    dispatch(fetchBooks(queryParams))
+  }
+
+  const handlePageChange = newPage => {
+    setCurrentPage(newPage)
+    window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll to top
+  }
 
   const [filters, setFilters] = useState(() => {
     return (
@@ -112,52 +135,86 @@ const Category = () => {
   return (
     <div className='bg-gray-100 relative py-4'>
       <div className='container'>
-        <div className='flex gap-4 justify-between pt-36'>
+        <div className='flex gap-4 pt-40'>
           {/* Sidebar (Visible only on larger screens) */}
-          <div className='hidden md:block min-w-64'>
-            <Sidebar />
-          </div>
-
-          {/* Products Section */}
+          <Sidebar />
           <div className='flex-1'>
-            <div className='flex items-center justify-between'>
-              <div className='px-2'>
-                <h1 className='text-2xl font-semibold'>Story</h1>
-                <p>(Showing 1 to 60 of 10000 items)</p>
-              </div>
-              <div className='hidden md:flex items-center gap-4 pr-6'>
-                <div className='flex items-center gap-1 '>
-                  <BsSortUpAlt className='mt-[2px]' />
-                  <p>Sort By:</p>
+            {/* Products Section */}
+            <div className='flex-1'>
+              <div className='flex items-center justify-between'>
+                <div className='px-2'>
+                  <h1 className='text-2xl font-semibold'>Story</h1>
+                  <p>(Showing 1 to 60 of 10000 items)</p>
                 </div>
-                <select
-                  className='border px-4 py-2 rounded'
-                  onChange={e => handleSort(e)} // Auto-close on selection
-                >
-                  <option value=''>Sort By</option>
-                  <option value='priceLowToHigh'>Price: Low to High</option>
-                  <option value='priceHighToLow'>Price: High to Low</option>
-                  <option value='discountHighToLow'>
-                    Discount: High to Low
-                  </option>
-                  <option value='discountLowToHigh'>
-                    Discount: Low to High
-                  </option>
-                  <option value='nameAsc'>Name: A to Z</option>
-                  <option value='nameDesc'>Name: Z to A</option>
-                </select>
+                <div className='hidden md:flex items-center gap-4 pr-6'>
+                  <div className='flex items-center gap-1 '>
+                    <BsSortUpAlt className='mt-[2px]' />
+                    <p>Sort By:</p>
+                  </div>
+                  <select
+                    className='border px-4 py-2 rounded'
+                    onChange={e => handleSort(e)} // Auto-close on selection
+                  >
+                    <option value=''>Sort By</option>
+                    <option value='priceLowToHigh'>Price: Low to High</option>
+                    <option value='priceHighToLow'>Price: High to Low</option>
+                    <option value='discountHighToLow'>
+                      Discount: High to Low
+                    </option>
+                    <option value='discountLowToHigh'>
+                      Discount: Low to High
+                    </option>
+                    <option value='nameAsc'>Name: A to Z</option>
+                    <option value='nameDesc'>Name: Z to A</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Products Grid */}
+              <div className='grid grid-cols-2 gap-2 sm:flex justify-items-center sm:gap-4 flex-wrap mt-2 sm:mt-8'>
+                {/* {[...Array(30)].map((_, index) => (
+                <ProductCard key={index} />
+              ))} */}
+                {books.data &&
+                  books.data.map((book, i) => (
+                    <ProductCard key={i} book={book} />
+                  ))}
               </div>
             </div>
 
-            {/* Products Grid */}
-            <div className='grid grid-cols-2 gap-2 sm:flex justify-items-center sm:gap-4 flex-wrap mt-2 sm:mt-8'>
-              {/* {[...Array(30)].map((_, index) => (
-                <ProductCard key={index} />
-              ))} */}
-              {books.data &&
-                books.data.map((book, i) => (
-                  <ProductCard key={i} book={book} />
-                ))}
+            {/* Pagination Buttons */}
+            <div className='flex justify-center mt-6'>
+              {totalPages > 1 && (
+                <div className='flex items-center gap-2'>
+                  <button
+                    className='border px-4 py-2 rounded bg-gray-200 hover:bg-gray-300'
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  >
+                    Previous
+                  </button>
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index}
+                      className={`border px-4 py-2 rounded ${
+                        currentPage === index + 1
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-200 hover:bg-gray-300'
+                      }`}
+                      onClick={() => handlePageChange(index + 1)}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  <button
+                    className='border px-4 py-2 rounded bg-gray-200 hover:bg-gray-300'
+                    disabled={currentPage === books.totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -199,17 +256,13 @@ const Category = () => {
             className='bg-white rounded-lg p- w-full h-[85%] overflow-y-scroll relative '
             onClick={e => e.stopPropagation()} // Prevent modal close on content click
           >
-            <h2 className='text-lg w-full font-semibold mb-4 text-center bg-white fixed py-2 border-b border-b-gray-300 flex justify-center items-center gap-2'>
+            <h2 className='text-lg w-full font-semibold mb-4 text-center bg-white fixed py-2 border-b border-b-gray-300 flex justify-center items-center gap-2 z-50'>
               <LuListFilter />
               Filter Options
             </h2>
 
             <div className='flex flex-col gap-2 pt-12 items-center'>
-              <SelectFilter title='Categories' options={categories} />
-              <SelectFilter title='Authors' options={authors} />
-              <SelectFilter title='Publishers' options={publishers} />
-              <SelectFilter title='Languages' options={languages} />
-              <ReviewFilter />
+              <Sidebar />
             </div>
           </div>
         </div>
@@ -229,7 +282,8 @@ const Category = () => {
             <h2 className='text-lg font-semibold mb-4'>Sort Options</h2>
             <select
               className='border w-full px-4 py-2 rounded'
-              onChange={() => setIsSortOpen(false)} // Auto-close on selection
+              onChange={e => handleSort(e)}
+              // Auto-close on selection
             >
               <option value=''>Sort By</option>
               <option value='priceLowToHigh'>Price: Low to High</option>

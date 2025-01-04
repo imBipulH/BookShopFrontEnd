@@ -42,10 +42,10 @@ export const AddressModal = ({ isOpen, onClose }) => {
       className='fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50'
       onClick={handleBackdropClick}
     >
-      <div className='bg-white rounded-lg w-1/2 p-6 shadow-lg relative'>
+      <div className='bg-white rounded-lg md:w-1/2 p-6 shadow-lg relative'>
         <h2 className='text-xl font-bold mb-4'>Add New Shipping Address</h2>
         <form onSubmit={handleSubmit}>
-          <div className='grid grid-cols-2 gap-4'>
+          <div className='grid grid-cols-2  gap-4'>
             <div>
               <label className='block text-gray-700 mb-2'>Full Name</label>
               <input
@@ -53,7 +53,7 @@ export const AddressModal = ({ isOpen, onClose }) => {
                 name='name'
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder='Enter your first and last name'
+                placeholder='Enter your fullname'
                 className='w-full border border-gray-300 rounded p-2'
                 required
               />
@@ -65,7 +65,7 @@ export const AddressModal = ({ isOpen, onClose }) => {
                 name='phone'
                 value={formData.phone}
                 onChange={handleInputChange}
-                placeholder='Enter your phone number'
+                placeholder='01XXXXXX'
                 className='w-full border border-gray-300 rounded p-2'
                 required
               />
@@ -79,7 +79,7 @@ export const AddressModal = ({ isOpen, onClose }) => {
                 name='alternativeNumber'
                 value={formData.alternativeNumber}
                 onChange={handleInputChange}
-                placeholder='Enter your phone number'
+                placeholder='01XXXXXX'
                 className='w-full border border-gray-300 rounded p-2'
               />
             </div>
@@ -121,7 +121,7 @@ export const AddressModal = ({ isOpen, onClose }) => {
                 required
               />
             </div>
-            <div>
+            <div className='col-span-2'>
               <label className='block text-gray-700 mb-2'>
                 Address Details
               </label>

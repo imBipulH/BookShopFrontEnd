@@ -20,8 +20,6 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials, { rejectWithValue }) => {
     try {
-      console.log(credentials)
-
       const response = await axiosInstance.post(`login`, credentials)
       console.log(response.data)
       return response.data
@@ -37,7 +35,7 @@ export const verifyLogin = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get('verify')
-      console.log(response.data)
+      console.log(response.data, 'verify')
 
       return response.data // Contains user data
     } catch (error) {
@@ -121,7 +119,7 @@ const authSlice = createSlice({
     })
     builder.addCase(verifyLogin.fulfilled, (state, action) => {
       state.loading = false
-      state.user = action.payload.user // Set user from response
+      state.user = action.payload.user.user // Set user from response
     })
     builder.addCase(verifyLogin.rejected, (state, action) => {
       state.loading = false

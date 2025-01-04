@@ -2,8 +2,8 @@ import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import Navbar from '../../components/Navbar'
-import Footer from '../../components/Footer'
+import Navbar from '../../components/Layouts/Navbar'
+import Footer from '../../components/Layouts/Footer'
 import { HandleRegister } from './HandleRegister'
 
 const Registration = () => {

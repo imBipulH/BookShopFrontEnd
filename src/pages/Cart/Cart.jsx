@@ -17,7 +17,7 @@ import {
   updateCartItemQuantity,
   updateItemSelection
 } from '../../store/shop/cartSlice'
-import Footer from '../../components/Footer'
+import Footer from '../../components/Layouts/Footer'
 import { Link } from 'react-router-dom'
 
 const CartItems = React.memo(({ item, handleDelete }) => {
@@ -40,7 +40,6 @@ const CartItems = React.memo(({ item, handleDelete }) => {
       })
     )
   }
-  console.log(item)
 
   const calculatePrice = () => {
     if (item?.productId?.discountPercentage > 0) {
@@ -64,12 +63,12 @@ const CartItems = React.memo(({ item, handleDelete }) => {
         type='checkbox'
         className='w-5 cursor-pointer'
       />
-      <div className='flex items-center w-36 justify-center  max-w-20 md:max-w-40'>
+      <div className='flex items-center justify-center w-20 h-24 md:h-36 md:w-28 bg-white'>
         <img
           src={
-            item?.productId?.coverImage || 'https://via.placeholder.com/150x150'
+            item?.productId?.coverImage || 'https://via.placeholder.com/250x250'
           }
-          className='max-h-28 md:max-h-40'
+          className='h-full object-cover'
         />
       </div>
       <div>
@@ -204,7 +203,8 @@ const Cart = () => {
   return (
     <div className='bg-global_bg pt-28 md:pt-40 pb-8'>
       <div className='container'>
-        <div className='flex flex-col md:flex-row gap-2 md:gap-8'>
+        <div className='flex relative flex-col md:flex-row gap-2 md:gap-8'>
+          {/* Cart Items */}
           <div className='flex-1 flex flex-col gap-0'>
             <h1 className='text-xl bg-sky-50 px-8 font-semibold'>
               Shopping Cart
@@ -242,7 +242,9 @@ const Cart = () => {
                 ))
               : null}
           </div>
-          <div className=' md:w-1/3 h-fit shadow-xl px-6 py-4 bg-white'>
+
+          {/* Check Out Summery */}
+          <div className='md:sticky md:w-1/3 h-fit shadow-xl px-6 py-4 bg-white'>
             <h3 className='text-xl mb-2 border-b pb-2'>Checkout Summary</h3>
             <div className='flex justify-between items-center text-base'>
               <p>

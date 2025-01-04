@@ -7,9 +7,9 @@ import axiosInstance from '../../utils/axiosInstance'
 export const fetchBooks = createAsyncThunk(
   'books/fetchBooks',
   async (filters, { rejectWithValue }) => {
-    try {
-      console.log(filters)
+    console.log('filters:', filters)
 
+    try {
       const response = await axiosInstance.get(`books?${filters}`)
       return response.data
     } catch (error) {
@@ -31,6 +31,9 @@ const booksSlice = createSlice({
   name: 'books',
   initialState: {
     books: [],
+    totalItems: 0,
+    totalPages: 0,
+    currentPage: 1,
     status: 'idle',
     error: null
   },
@@ -43,7 +46,11 @@ const booksSlice = createSlice({
       })
       .addCase(fetchBooks.fulfilled, (state, action) => {
         state.status = 'succeeded'
+        console.log('action: ', action.payload)
         state.books = action.payload
+        state.totalItems = action.payload.totalItems
+        state.totalPages = action.payload.totalPages
+        state.currentPage = action.payload.currentPage
       })
       .addCase(fetchBooks.rejected, (state, action) => {
         state.status = 'failed'

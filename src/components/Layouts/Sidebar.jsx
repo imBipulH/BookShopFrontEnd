@@ -1,15 +1,15 @@
 /* eslint-disable react/display-name */
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
-import ReviewFilter from './ui/sidebar.ui/ReviewFilter'
-import SelectFilter from './ui/sidebar.ui/SelectFilter'
+import ReviewFilter from '../ui/sidebar.ui/ReviewFilter'
+import SelectFilter from '../ui/sidebar.ui/SelectFilter'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchAuthors,
   fetchCategories,
   fetchPublishers
-} from '../store/shop/sidebarSlice'
-import { languages } from './Data'
-import { fetchBooks } from '../store/shop/bookSlice'
+} from '../../store/shop/sidebarSlice'
+import { languages } from '../Data'
+import { fetchBooks } from '../../store/shop/bookSlice'
 import { debounce, throttle } from 'lodash'
 
 const Sidebar = memo(() => {
@@ -28,7 +28,9 @@ const Sidebar = memo(() => {
         publishers: [],
         languages: [],
         sort: null,
-        sortOrder: null
+        sortOrder: null,
+        page: 1,
+        limit: 10
       }
     )
   })
@@ -163,7 +165,7 @@ const Sidebar = memo(() => {
   return (
     <div
       ref={sidebarRef}
-      className='relative transition-transform duration-300 ease-in-out flex-col justify-end items-baseline'
+      className='relative transition-transform duration-300 ease-in-out flex-col justify-end items-baseline hidden md:block min-w-64'
     >
       <div className='flex flex-col space-y-4 ' ref={sidebarContentRef}>
         <SelectFilter

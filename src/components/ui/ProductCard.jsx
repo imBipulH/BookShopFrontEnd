@@ -4,13 +4,18 @@ import { FiHeart, FiShoppingCart } from 'react-icons/fi'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { addToCart } from '../../store/shop/cartSlice'
+import { addItemToWishlist } from '../../store/shop/wishListSlice'
 
 const ProductCard = ({ book, rating = 4, className }) => {
   const dispatch = useDispatch()
-  
+
   const handleAddToCart = event => {
     event.stopPropagation()
     dispatch(addToCart({ productId: book?._id, quantity: 1 }))
+  }
+
+  const handleAddToWishlist = () => {
+    dispatch(addItemToWishlist(book._id))
   }
 
   const calculatePrice = () => {
@@ -26,7 +31,7 @@ const ProductCard = ({ book, rating = 4, className }) => {
 
   return (
     <div
-      className={`bg-white rounded-md p-2 max-w-60 sm:w-52 border cursor-pointer group relative ${className}`}
+      className={`bg-white rounded-md p-2 max-w-60 min-w-44 sm:w-52 border cursor-pointer group relative ${className}`}
     >
       <Link to={`/book/${book?._id}`}>
         <div className=' bg-sky-50 hover:shadow-md h-36 overflow-hidden relative'>
@@ -83,6 +88,7 @@ const ProductCard = ({ book, rating = 4, className }) => {
       {/* Hover Buttons */}
       <div className='absolute top-[120px] w-[calc(100%-16px)] left-2 flex items-end justify-center  opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-[0px_-5px_60px_-5px_rgba(0,0,0,0.6)]'>
         <button
+          onClick={handleAddToWishlist}
           className='p-2 bg-white w-full shadow-md hover:bg-red-500 hover:text-white transition-all'
           title='Add to Wishlist'
         >
