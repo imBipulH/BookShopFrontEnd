@@ -338,8 +338,6 @@ const Home = () => {
           'categories/books-for-homepage',
           categoryForHomePage
         )
-        console.log(response)
-
         setBooksByCategoryGroup(response.data)
       } catch (error) {
         console.error('Error fetching books:', error)

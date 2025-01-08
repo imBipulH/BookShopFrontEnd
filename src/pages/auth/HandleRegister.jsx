@@ -8,6 +8,7 @@ export const HandleRegister = async (formData, setAlert, setErrors) => {
 
     // Send the form data to the backend
     const response = await axiosInstance.post('register', formData)
+    console.log(response)
 
     // Handle success
     if (response.status === 201) {
@@ -22,18 +23,28 @@ export const HandleRegister = async (formData, setAlert, setErrors) => {
       })
     }
   } catch (error) {
+    console.log(error.response)
+
     // Handle validation errors from backend
-    if (error.response?.data?.errors) {
-      const apiErrors = error.response.data.errors.reduce((acc, curr) => {
-        acc[curr.field] = curr.message
-        return acc
-      }, {})
-      setErrors(apiErrors)
+    if (error.response) {
+      if (error.response.status === 400) {
+        console.log('Error.res.data.msg', error.response.data.message)
+
+        setAlert({
+          type: 'error',
+          message: error.response.data.message || 'Bad Request'
+        })
+      } else {
+        setAlert({
+          type: 'error',
+          message: 'Registration failed (****). Please try again later.'
+        })
+      }
     } else {
-      // General error
+      // Network or unexpected error
       setAlert({
         type: 'error',
-        message: 'Registration failed. Please try again later.'
+        message: 'An unexpected error occurred. Please try again.'
       })
     }
   }

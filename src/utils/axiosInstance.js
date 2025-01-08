@@ -23,13 +23,14 @@ axiosInstance.interceptors.request.use(
     //   }
     // })
     const token = localStorage.getItem('token') // Or retrieve from cookies
-    console.log(token, 'token')
+    // console.log(token, 'token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
   },
   error => {
+    console.log('Interceptor Error:', error.response)
     return Promise.reject(error)
   }
 )
