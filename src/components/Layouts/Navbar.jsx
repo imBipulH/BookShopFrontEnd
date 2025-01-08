@@ -11,9 +11,12 @@ import axiosInstance from '../../utils/axiosInstance'
 import { CiLogout } from 'react-icons/ci'
 import {
   clearSuggestions,
-  fetchSearchSuggestions
+  fetchSearchSuggestions,
+  initializeFuse,
+  performFuseSearch
 } from '../../store/shop/searchSlice'
 import Suggestions from './ui/Suggestions'
+import { fetchBooks } from '../../store/shop/bookSlice'
 const Navbar = () => {
   const dispatch = useDispatch()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -22,9 +25,10 @@ const Navbar = () => {
   const { user } = useSelector(state => state?.auth || null)
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedTerm, setDebouncedTerm] = useState('')
-  const { suggestions } = useSelector(state => state?.search)
-  console.log(suggestions)
+  const { suggestions, fuseResults } = useSelector(state => state?.search)
+  // console.log(suggestions, 'FuseResults', fuseResults)
 
+  // Get window width
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   useEffect(() => {
     const handleResize = () => {
@@ -36,13 +40,21 @@ const Navbar = () => {
     }
   }, [])
 
-  console.log(windowWidth)
+  const setupSearch = async () => {
+    const books = await dispatch(fetchBooks()).unwrap()
+    // Initialize Fuse.js with the books data
+    dispatch(initializeFuse(books))
+  }
+
+  useEffect(() => {
+    setupSearch() // Initialize search on component mount
+  }, [])
 
   // Debounce effect
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedTerm(searchTerm)
-    }, 400) // Adjust the delay as needed
+    }, 400)
 
     return () => {
       clearTimeout(timer) // Clear the timeout on cleanup
@@ -51,6 +63,7 @@ const Navbar = () => {
 
   useEffect(() => {
     if (debouncedTerm.trim().length > 2) {
+      dispatch(performFuseSearch({ query: debouncedTerm }))
       dispatch(fetchSearchSuggestions(debouncedTerm))
     } else {
       dispatch(clearSuggestions())
@@ -82,24 +95,24 @@ const Navbar = () => {
   }
 
   const categories = [
-    'সকল বই',
-    'ধরন',
-    'বিষয়',
-    'প্রকাশনী',
-    'প্রবেশিকা ২০২৪',
-    'ই-বুক',
-    'HSC ও ভর্তি প্রস্তুতি',
-    'ইসলামী বই',
-    'ইংরেজি ভাষার বই',
-    'পশ্চিমাদের বই',
-    'অডিও বই'
+    { label: 'সকল বই', link: '/category' },
+    { label: 'ধরন', link: '/category' },
+    { label: 'বিষয়', link: '/allcategories' },
+    { label: 'প্রকাশনী', link: '/publishers' },
+    { label: 'লেখক', link: '/authors' },
+    { label: 'ই-বুক', link: '/category' },
+    { label: 'HSC ও ভর্তি প্রস্তুতি', link: '/category' },
+    { label: 'ইসলামী বই', link: '/category' },
+    { label: 'ইংরেজি ভাষার বই', link: '/category' },
+    { label: 'পশ্চিমাদের বই', link: '/category' }
+    // { label: 'অডিও বই', link: '/category' }
   ]
 
   // Ref for horizontal scrolling
   const categoryRef = useRef(null)
 
-  // Horizontal Scroll for Categories
-  const scrollCategories = direction => {
+  // Horizontal Scroll for category
+  const scrollCategory = direction => {
     if (categoryRef.current) {
       const scrollAmount = 150
       categoryRef.current.scrollBy({
@@ -142,9 +155,9 @@ const Navbar = () => {
               placeholder='Search by Books...'
               className=' w-full py-2 px-4 border border-gray-300 rounded-full focus:ring-2 focus:ring-sky-500 focus:outline-none hidden md:block'
             />
-            {windowWidth > 767 && suggestions.length > 0 && (
+            {windowWidth > 767 && fuseResults.length > 0 && (
               <ul className='absolute top-full rounded-t-2xl left-0 w-full py-2 bg-white border mt-1 z-10 max-h-[80dvh] overflow-y-scroll'>
-                {suggestions.map(book => (
+                {fuseResults.map(book => (
                   <Suggestions key={book._id} book={book} />
                 ))}
               </ul>
@@ -289,11 +302,11 @@ const Navbar = () => {
             {categories.map((category, index) => (
               <li key={index}>
                 <Link
-                  to={`/category/${category}`}
+                  to={category.link}
                   className='block py-2 px-4 text-gray-700 hover:bg-sky-600 hover:text-white rounded'
                   onClick={() => setMenuOpen(false)} // Close menu after click
                 >
-                  {category}
+                  {category.label}
                 </Link>
               </li>
             ))}
@@ -308,32 +321,33 @@ const Navbar = () => {
           ></div>
         )}
 
-        {/* Categories on navbar (Desktop Only) */}
+        {/* category on navbar (Desktop Only) */}
         <div className='bg-white py-2 hidden md:block relative'>
-          <div className='flex items-center px-6'>
+          <div className='flex items-center px-4'>
             <button
-              onClick={() => scrollCategories('left')}
+              onClick={() => scrollCategory('left')}
               className='text-sky-600 hover:text-sky-700 px-2'
             >
               <FaChevronLeft />
             </button>
-            <Link
+            <div
               ref={categoryRef}
               to='/category'
               className='flex space-x-4 overflow-hidden py-2'
             >
               {categories?.map((category, index) => (
-                <button
+                <Link
                   key={index}
+                  to={category.link}
                   className='flex-shrink-0 py-2 px-4 bg-white border border-gray-300 rounded hover:bg-sky-600 hover:text-white transition'
                 >
-                  {category}
-                </button>
-              ))}{' '}
-            </Link>
+                  {category.label}
+                </Link>
+              ))}
+            </div>
             {/* Right Arrow */}
             <button
-              onClick={() => scrollCategories('right')}
+              onClick={() => scrollCategory('right')}
               className='text-sky-600 hover:text-sky-700 px-2'
             >
               <FaChevronRight />

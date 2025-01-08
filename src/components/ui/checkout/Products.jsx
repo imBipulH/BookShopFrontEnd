@@ -19,13 +19,13 @@ const Products = ({ item }) => {
   return (
     <div className='grid grid-cols-2 justify-between  items-center text-gray-700 border-b pb-2 mb-2'>
       <div className='flex justify-start items-center gap-2'>
-        <div className='flex items-center justify-center w-10 md:w-36 md:max-w-40'>
+        <div className='flex items-center justify-center w-10 h-16 md:h-20 md:w-16'>
           <img
             src={
               item?.productId?.coverImage ||
               'https://via.placeholder.com/150x150'
             }
-            className='max-h-10 object-cover md:max-h-20'
+            className='h-full object-cover'
           />
         </div>
         <p className='text-xs md:text-base'>{item?.productId?.title}</p>

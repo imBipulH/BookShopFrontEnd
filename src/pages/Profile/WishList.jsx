@@ -4,17 +4,33 @@ import { FaRegTrashAlt } from 'react-icons/fa'
 import { IoCartOutline } from 'react-icons/io5'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
-import { fetchWishlist } from '../../store/shop/wishListSlice'
+import {
+  fetchWishlist,
+  removeItemFromWishlist
+} from '../../store/shop/wishListSlice'
+import { addToCart } from '../../store/shop/cartSlice'
 
 const WishList = () => {
   const dispatch = useDispatch()
   const { items } = useSelector(state => state.wishList)
+
   useEffect(() => {
     dispatch(fetchWishlist())
-  }, [])
+  }, [dispatch])
+
+  const handleDeleteWishList = bookId => {
+    dispatch(removeItemFromWishlist(bookId))
+  }
+  const handleAddToCart = book => {
+    dispatch(addToCart({ productId: book?._id, quantity: 1 }))
+  }
+
   console.log('Wishlist items', items?.books)
 
   const WishListItem = ({ book }) => {
+    const { cart } = useSelector(state => state?.cart)
+    const isInCart = cart.some(item => item.productId._id == book?._id)
+
     return (
       <div
         key={book?._id}
@@ -46,7 +62,10 @@ const WishList = () => {
             </div>
             <p className='text-sm text-black'>(Only 4 copies available)</p>
           </div>
-          <div className=' hidden sm:block gap-1 sm:gap-2 mt-2 items-center'>
+          <div
+            onClick={() => handleDeleteWishList(book?._id)}
+            className=' hidden sm:block gap-1 sm:gap-2 mt-2 items-center'
+          >
             <FaRegTrashAlt className='text-sm md:text-3xl hover:text-red-500 hover:bg-red-200 rounded-md md:p-1.5 transition-all duration-200 cursor-pointer' />
           </div>
         </div>
@@ -58,11 +77,19 @@ const WishList = () => {
           <p className='line-through text-gray-500'>500 Tk</p>
           <div className='flex gap-4 sm:gap-2 mt-2 items-center'>
             <FaRegTrashAlt className='text-sm md:text-3xl block sm:hidden hover:text-red-500 hover:bg-red-200 rounded-md md:p-1.5 transition-all duration-200 cursor-pointer' />
-
-            <button className='flex items-center gap-1 rounded border px-2 sm:px-4 py-1 sm:py-2 border-sky-500 bg-sky-600 transition-all duration-200 hover:bg-sky-500 text-white '>
-              <IoCartOutline className='text-lg sm:text-2xl' />
-              <span className='hidden sm:block'>Add to Cart </span>
-            </button>
+            {isInCart ? (
+              <button className='flex items-center gap-1 rounded border px-2 sm:px-4 py-1 sm:py-2 bg-gray-400 transition-all duration-200  text-white '>
+                Added
+              </button>
+            ) : (
+              <button
+                onClick={() => handleAddToCart(book)}
+                className='flex items-center gap-1 rounded border px-2 sm:px-4 py-1 sm:py-2 border-sky-500 bg-sky-600 transition-all duration-200 hover:bg-sky-500 text-white '
+              >
+                <IoCartOutline className='text-lg sm:text-2xl' />
+                <span className='hidden sm:block'>Add to Cart </span>
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable react/display-name */
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef } from 'react'
 import ReviewFilter from '../ui/sidebar.ui/ReviewFilter'
 import SelectFilter from '../ui/sidebar.ui/SelectFilter'
 import { useDispatch, useSelector } from 'react-redux'
@@ -11,8 +12,11 @@ import {
 import { languages } from '../Data'
 import { fetchBooks } from '../../store/shop/bookSlice'
 import { debounce, throttle } from 'lodash'
+import { useNavigate, useParams } from 'react-router-dom'
 
-const Sidebar = memo(() => {
+const Sidebar = memo(({ filters, setFilters }) => {
+  const navigate = useNavigate()
+  const { type, id } = useParams()
   const dispatch = useDispatch()
   const sidebarRef = useRef(null)
   const sidebarContentRef = useRef(null)
@@ -20,20 +24,6 @@ const Sidebar = memo(() => {
   const { categories, authors, publishers } = useSelector(
     state => state.sidebar
   )
-  const [filters, setFilters] = useState(() => {
-    return (
-      JSON.parse(sessionStorage.getItem('filters')) || {
-        categories: [],
-        authors: [],
-        publishers: [],
-        languages: [],
-        sort: null,
-        sortOrder: null,
-        page: 1,
-        limit: 10
-      }
-    )
-  })
 
   function handleFilter (getSectionId, getCurrentOption) {
     let cpyFilters = { ...filters }
@@ -157,6 +147,10 @@ const Sidebar = memo(() => {
     setFilters(updatedFilters) // Update the state
     sessionStorage.setItem('filters', JSON.stringify(updatedFilters)) // Update sessionStorage
 
+    if (type && id) {
+      navigate('/category')
+    }
+
     await getBooks()
   }
 
@@ -165,7 +159,7 @@ const Sidebar = memo(() => {
   return (
     <div
       ref={sidebarRef}
-      className='relative transition-transform duration-300 ease-in-out flex-col justify-end items-baseline hidden md:block min-w-64'
+      className='relative transition-transform duration-300 ease-in-out flex-col justify-end items-baseline block min-w-64'
     >
       <div className='flex flex-col space-y-4 ' ref={sidebarContentRef}>
         <SelectFilter

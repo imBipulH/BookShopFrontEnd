@@ -53,6 +53,8 @@ const wishListSlice = createSlice({
         state.isLoading = true
       })
       .addCase(fetchWishlist.fulfilled, (state, action) => {
+        console.log(action.payload)
+
         state.items = action.payload
         state.isLoading = false
       })
@@ -64,7 +66,9 @@ const wishListSlice = createSlice({
         state.items = action.payload
       })
       .addCase(removeItemFromWishlist.fulfilled, (state, action) => {
-        state.items = state.items.filter(item => item.id !== action.payload)
+        console.log(action.payload)
+
+        state.items = action.payload
       })
   }
 })

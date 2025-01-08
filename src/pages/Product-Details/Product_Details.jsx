@@ -162,12 +162,19 @@ const Product_Details = () => {
                 </button>
                 <button
                   onClick={handleAddToCart}
-                  className='flex items-center gap-1 rounded border px-4 py-2 border-sky-500 bg-sky-600 transition-all duration-200 hover:bg-sky-500 text-white '
+                  className='relative flex items-center gap-1 rounded border px-4 py-2 border-sky-500 bg-sky-600 transition-all duration-200 hover:bg-sky-500 text-white '
                 >
                   <span>
                     <IoCartOutline className='text-2xl' />
                   </span>
-                  {cartStatus === 'loading' ? 'Adding...' : 'Add to Cart'}
+                  {cartStatus === 'loading' ? (
+                    <img
+                      className='absolute h-full w-full inset-0'
+                      src='../../../src/assets/loading-loader.gif'
+                    />
+                  ) : (
+                    'Add to Cart'
+                  )}
                 </button>
               </div>
               <div>
@@ -217,7 +224,11 @@ const Product_Details = () => {
             <span>
               <IoCartOutline className='text-2xl' />
             </span>
-            {cartStatus === 'loading' ? 'Adding...' : 'Add to Cart'}
+            {cartStatus === 'loading' ? (
+              <img src='../../../src/assets/loading-loader.gif' />
+            ) : (
+              'Add to Cart'
+            )}
           </button>
         </div>
       </div>

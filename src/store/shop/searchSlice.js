@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axiosInstance from '../../utils/axiosInstance'
+import Fuse from 'fuse.js'
 
 // Async Thunk for fetching search suggestions
 export const fetchSearchSuggestions = createAsyncThunk(
@@ -15,17 +16,38 @@ export const fetchSearchSuggestions = createAsyncThunk(
     }
   }
 )
+let fuseInstance = null
 
 const searchSlice = createSlice({
   name: 'search',
   initialState: {
     suggestions: [],
+    fuseResults: [],
+    allBooks: [],
     loading: false,
     error: null
   },
   reducers: {
     clearSuggestions (state) {
       state.suggestions = []
+      state.fuseResults = []
+      state.error = null
+    },
+    initializeFuse (state, action) {
+      const books = action.payload.data
+      const options = {
+        keys: ['title', 'author.name', 'isbn', 'category.name'],
+        threshold: 0.4,
+        distance: 100
+      }
+      fuseInstance = new Fuse(books, options)
+    },
+    performFuseSearch (state, action) {
+      const { query } = action.payload
+      if (fuseInstance) {
+        const results = fuseInstance.search(query).map(result => result.item)
+        state.fuseResults = results
+      }
     }
   },
   extraReducers: builder => {
@@ -45,5 +67,6 @@ const searchSlice = createSlice({
   }
 })
 
-export const { clearSuggestions } = searchSlice.actions
+export const { clearSuggestions, initializeFuse, performFuseSearch } =
+  searchSlice.actions
 export default searchSlice.reducer

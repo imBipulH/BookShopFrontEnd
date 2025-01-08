@@ -35,8 +35,6 @@ export const verifyLogin = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get('verify')
-      console.log(response.data, 'verify')
-
       return response.data // Contains user data
     } catch (error) {
       return rejectWithValue(error.response.data || 'Verification failed')

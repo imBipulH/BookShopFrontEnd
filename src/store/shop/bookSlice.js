@@ -46,7 +46,6 @@ const booksSlice = createSlice({
       })
       .addCase(fetchBooks.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        console.log('action: ', action.payload)
         state.books = action.payload
         state.totalItems = action.payload.totalItems
         state.totalPages = action.payload.totalPages

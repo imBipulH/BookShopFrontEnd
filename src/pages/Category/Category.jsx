@@ -10,43 +10,18 @@ import {
   fetchCategories,
   fetchPublishers
 } from '../../store/shop/sidebarSlice'
+import Breadcrumb from './Breadcumb'
+import { useParams } from 'react-router-dom'
 
 const Category = () => {
   const dispatch = useDispatch()
+  const { type, id } = useParams()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isSortOpen, setIsSortOpen] = useState(false)
   const { books } = useSelector(state => state.books)
   const { totalPages } = useSelector(state => state.books)
+  const [itemsPerPage, setItemsPerPage] = useState(30)
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
-
-  console.log('totalPages: ', totalPages)
-
-  const storedFilters = JSON.parse(sessionStorage.getItem('filters')) || {}
-
-  const updatedFilters = {
-    ...storedFilters,
-    page: currentPage,
-    limit: itemsPerPage
-  }
-  sessionStorage.setItem('filters', JSON.stringify(updatedFilters))
-
-  useEffect(() => {
-    fetchBooksWithPagination()
-  }, [currentPage])
-
-  const fetchBooksWithPagination = () => {
-    console.log('updatedFilters', updatedFilters)
-
-    const queryParams = new URLSearchParams(updatedFilters).toString()
-    dispatch(fetchBooks(queryParams))
-  }
-
-  const handlePageChange = newPage => {
-    setCurrentPage(newPage)
-    window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll to top
-  }
-
   const [filters, setFilters] = useState(() => {
     return (
       JSON.parse(sessionStorage.getItem('filters')) || {
@@ -60,11 +35,49 @@ const Category = () => {
     )
   })
 
+  const [range, setRange] = useState({ start: 1, end: itemsPerPage })
+
+  console.log('Category page Rendering..')
+
+  useEffect(() => {
+    const start = (currentPage - 1) * itemsPerPage + 1
+    const end = Math.min(currentPage * itemsPerPage, books.totalItems || 0)
+    setRange({ start, end })
+  }, [currentPage, itemsPerPage, books])
+
+  const storedFilters = JSON.parse(sessionStorage.getItem('filters')) || {}
+
+  const updatedFilters = {
+    ...storedFilters,
+    page: currentPage,
+    limit: itemsPerPage,
+    [type]: id ? [id] : filters[type]
+  }
+  sessionStorage.setItem('filters', JSON.stringify(updatedFilters))
+
+  const fetchBooksWithPagination = () => {
+    const queryParams = new URLSearchParams(updatedFilters).toString()
+    console.log('Query Parameters:', queryParams)
+    dispatch(fetchBooks(queryParams))
+  }
+
+  useEffect(() => {
+    fetchBooksWithPagination()
+  }, [id, type, itemsPerPage, currentPage])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [itemsPerPage])
+
+  const handlePageChange = newPage => {
+    setCurrentPage(newPage)
+    window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll to top
+  }
+
   useEffect(() => {
     dispatch(fetchCategories())
     dispatch(fetchAuthors())
     dispatch(fetchPublishers())
-    dispatch(fetchBooks())
   }, [dispatch])
 
   const handleSort = event => {
@@ -135,46 +148,76 @@ const Category = () => {
   return (
     <div className='bg-gray-100 relative py-4'>
       <div className='container'>
-        <div className='flex gap-4 pt-40'>
+        <div className='flex gap-4 pt-24 md:pt-40'>
           {/* Sidebar (Visible only on larger screens) */}
-          <Sidebar />
+          <div className='hidden md:block'>
+            <Sidebar filters={filters} setFilters={setFilters} />
+          </div>
           <div className='flex-1'>
             {/* Products Section */}
             <div className='flex-1'>
               <div className='flex items-center justify-between'>
                 <div className='px-2'>
-                  <h1 className='text-2xl font-semibold'>Story</h1>
-                  <p>(Showing 1 to 60 of 10000 items)</p>
+                  {/* Breadcrumb */}
+                  <Breadcrumb
+                    items={[
+                      { label: 'Home', path: '/' },
+                      { label: 'Books', path: '/category' }
+                    ]}
+                  />
+                  {/* <h1 className='text-2xl font-semibold'>Story</h1>
+                   */}
+
+                  <p className='text-sm md:text-lg text-gray-600 mt-1'>
+                    {`Showing ${range.start} to ${range.end} of ${books.totalItems} items`}{' '}
+                  </p>
                 </div>
-                <div className='hidden md:flex items-center gap-4 pr-6'>
-                  <div className='flex items-center gap-1 '>
-                    <BsSortUpAlt className='mt-[2px]' />
-                    <p>Sort By:</p>
+
+                {/* Items per page and sort options */}
+                <div className='flex items-center'>
+                  <div className='hidden md:flex items-center gap-4 pr-6'>
+                    <div className='flex items-center gap-1 '>
+                      <p>Items per page:</p>
+                    </div>
+                    <select
+                      className='border px-4 py-2 rounded'
+                      onChange={e => setItemsPerPage(parseInt(e.target.value))} // Auto-close on selection
+                    >
+                      <option value='20'>20</option>
+                      <option value='30'>30</option>
+                      <option value='40'>40</option>
+                      <option value='50'>50</option>
+                      <option value='60'>60</option>
+                      <option value='80'>80</option>
+                    </select>
                   </div>
-                  <select
-                    className='border px-4 py-2 rounded'
-                    onChange={e => handleSort(e)} // Auto-close on selection
-                  >
-                    <option value=''>Sort By</option>
-                    <option value='priceLowToHigh'>Price: Low to High</option>
-                    <option value='priceHighToLow'>Price: High to Low</option>
-                    <option value='discountHighToLow'>
-                      Discount: High to Low
-                    </option>
-                    <option value='discountLowToHigh'>
-                      Discount: Low to High
-                    </option>
-                    <option value='nameAsc'>Name: A to Z</option>
-                    <option value='nameDesc'>Name: Z to A</option>
-                  </select>
+                  <div className='hidden md:flex items-center gap-4 pr-6'>
+                    <div className='flex items-center gap-1 '>
+                      <BsSortUpAlt className='mt-[2px]' />
+                      <p>Sort By:</p>
+                    </div>
+                    <select
+                      className='border px-4 py-2 rounded'
+                      onChange={e => handleSort(e)} // Auto-close on selection
+                    >
+                      <option value=''>Sort By</option>
+                      <option value='priceLowToHigh'>Price: Low to High</option>
+                      <option value='priceHighToLow'>Price: High to Low</option>
+                      <option value='discountHighToLow'>
+                        Discount: High to Low
+                      </option>
+                      <option value='discountLowToHigh'>
+                        Discount: Low to High
+                      </option>
+                      <option value='nameAsc'>Name: A to Z</option>
+                      <option value='nameDesc'>Name: Z to A</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
               {/* Products Grid */}
               <div className='grid grid-cols-2 gap-2 sm:flex justify-items-center sm:gap-4 flex-wrap mt-2 sm:mt-8'>
-                {/* {[...Array(30)].map((_, index) => (
-                <ProductCard key={index} />
-              ))} */}
                 {books.data &&
                   books.data.map((book, i) => (
                     <ProductCard key={i} book={book} />
@@ -261,8 +304,8 @@ const Category = () => {
               Filter Options
             </h2>
 
-            <div className='flex flex-col gap-2 pt-12 items-center'>
-              <Sidebar />
+            <div className='flex flex-col gap-2 pt-12 items-center z-50'>
+              <Sidebar filters={filters} setFilters={setFilters} />
             </div>
           </div>
         </div>

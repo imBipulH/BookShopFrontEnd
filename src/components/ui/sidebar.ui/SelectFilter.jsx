@@ -87,6 +87,4 @@ const SelectFilter = memo(
   }
 )
 
-// SelectFilter.whyDidYouRender = true
-
 export default SelectFilter

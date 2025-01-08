@@ -14,7 +14,7 @@ const Suggestions = ({ book }) => {
 
   const isInCart = cart.some(item => item.productId._id == book?._id)
 
-  const handleSuggestionClick = ({ book }) => {
+  const handleSuggestionClick = book => {
     dispatch(clearSuggestions())
     navigate(`/book/${book?._id}`)
   }
@@ -41,8 +41,8 @@ const Suggestions = ({ book }) => {
         ) : (
           <span className='w-12 h-12 rounded-md bg-gray-400'></span>
         )}
-        {book.title} - {book.authorName} - {book.publisherName} -{book.price} -{' '}
-        {book?.discountPercentage}
+        {book.title} - {book._id} - {book.author.name} -{' '}
+        {book.category[0]?.name} -{book.price} - {book?.discountPercentage}
       </div>
 
       {isInCart ? (

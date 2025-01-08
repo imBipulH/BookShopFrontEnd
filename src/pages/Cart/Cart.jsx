@@ -63,7 +63,7 @@ const CartItems = React.memo(({ item, handleDelete }) => {
         type='checkbox'
         className='w-5 cursor-pointer'
       />
-      <div className='flex items-center justify-center w-20 h-24 md:h-36 md:w-28 bg-white'>
+      <div className='flex items-center justify-center my-auto w-20 h-24 md:h-36 md:w-28 bg-white'>
         <img
           src={
             item?.productId?.coverImage || 'https://via.placeholder.com/250x250'
@@ -206,10 +206,10 @@ const Cart = () => {
         <div className='flex relative flex-col md:flex-row gap-2 md:gap-8'>
           {/* Cart Items */}
           <div className='flex-1 flex flex-col gap-0'>
-            <h1 className='text-xl bg-sky-50 px-8 font-semibold'>
+            <h1 className='text-xl bg-sky-50 mx-auto md:ml-0 md:px-8 font-semibold'>
               Shopping Cart
             </h1>
-            <div className='flex items-center justify-between bg-sky-50 py-4 px-8 border-b border-b-primary'>
+            <div className='flex items-center justify-between bg-sky-50 py-4 px-2 md:px-8 border-b border-b-primary'>
               <div
                 onClick={handleSelectAll}
                 className='flex cursor-pointer items-center gap-2 py-1'
@@ -217,16 +217,18 @@ const Cart = () => {
                 <input
                   checked={selectAll}
                   type='checkbox'
-                  className='w-5 aspect-square cursor-pointer'
+                  className='w-4 md:w-5 aspect-square cursor-pointer'
                 />
-                <p>Select All</p>
-                <p className='text-gray-500 text-sm'>({cart?.length} items)</p>
+                <p className='text-sm md:text-base'>Select All</p>
+                <p className='text-gray-500 text-sm md:text-base'>
+                  ({cart?.length} items)
+                </p>
               </div>
               <div className='text-black'>
-                <p className=' text-base'>
+                <p className='text-sm md:text-base'>
                   Your Subtotal:{' '}
                   <span className='line-through text-red-500'>TK {MRP}</span> TK{' '}
-                  {subtotal?.toFixed(2)}
+                  {subtotal?.toFixed(0)}
                 </p>
               </div>
             </div>
