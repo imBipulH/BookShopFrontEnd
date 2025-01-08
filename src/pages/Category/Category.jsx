@@ -1,50 +1,143 @@
-import { useState } from 'react'
-import Navbar from '../../components/Navbar'
-import Sidebar from '../../components/Sidebar'
+import { useEffect, useState } from 'react'
+import Sidebar from '../../components/Layouts/Sidebar'
 import ProductCard from '../../components/ui/ProductCard'
-import ReviewFilter from '../../components/ui/sidebar.ui/ReviewFilter'
-import SelectFilter from '../../components/ui/sidebar.ui/SelectFilter'
 import { BsSortDownAlt, BsSortUpAlt } from 'react-icons/bs'
 import { LuListFilter } from 'react-icons/lu'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchBooks } from '../../store/shop/bookSlice'
+import {
+  fetchAuthors,
+  fetchCategories,
+  fetchPublishers
+} from '../../store/shop/sidebarSlice'
+import Breadcrumb from './Breadcumb'
+import { useParams } from 'react-router-dom'
 
-const categories = [
-  { id: 1, name: 'Fiction', parent: 'Books' },
-  { id: 2, name: 'Non-Fiction', parent: 'Books' },
-  { id: 3, name: 'Comics', parent: 'Books' },
-  { id: 4, name: 'Biography', parent: 'Books' },
-  { id: 5, name: 'Thriller', parent: 'Books' },
-  { id: 6, name: 'Romance', parent: 'Books' },
-  { id: 7, name: 'Romance', parent: 'Books' },
-  { id: 8, name: 'Romance', parent: 'Books' },
-  { id: 9, name: 'Romance', parent: 'Books' },
-  { id: 10, name: 'Romance', parent: 'Books' },
-  { id: 11, name: 'Romance', parent: 'Books' },
-  { id: 12, name: 'Romance', parent: 'Books' }
-]
-
-const authors = [
-  { id: 1, name: 'J.K. Rowling' },
-  { id: 2, name: 'George R.R. Martin' },
-  { id: 3, name: 'Agatha Christie' }
-  // ...more authors
-]
-
-const publishers = [
-  { id: 1, name: 'Penguin Random House' },
-  { id: 2, name: 'HarperCollins' },
-  { id: 3, name: 'Simon & Schuster' }
-  // ...more publishers
-]
-
-const languages = [
-  { id: 1, name: 'English' },
-  { id: 2, name: 'Spanish' },
-  { id: 3, name: 'French' }
-  // ...more languages
-]
 const Category = () => {
+  const dispatch = useDispatch()
+  const { type, id } = useParams()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isSortOpen, setIsSortOpen] = useState(false)
+  const { books } = useSelector(state => state.books)
+  const { totalPages } = useSelector(state => state.books)
+  const [itemsPerPage, setItemsPerPage] = useState(30)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [filters, setFilters] = useState(() => {
+    return (
+      JSON.parse(sessionStorage.getItem('filters')) || {
+        categories: [],
+        authors: [],
+        publishers: [],
+        languages: [],
+        sort: null,
+        sortOrder: null
+      }
+    )
+  })
+
+  const [range, setRange] = useState({ start: 1, end: itemsPerPage })
+
+  console.log('Category page Rendering..')
+
+  useEffect(() => {
+    const start = (currentPage - 1) * itemsPerPage + 1
+    const end = Math.min(currentPage * itemsPerPage, books.totalItems || 0)
+    setRange({ start, end })
+  }, [currentPage, itemsPerPage, books])
+
+  const storedFilters = JSON.parse(sessionStorage.getItem('filters')) || {}
+
+  const updatedFilters = {
+    ...storedFilters,
+    page: currentPage,
+    limit: itemsPerPage,
+    [type]: id ? [id] : filters[type]
+  }
+  sessionStorage.setItem('filters', JSON.stringify(updatedFilters))
+
+  const fetchBooksWithPagination = () => {
+    const queryParams = new URLSearchParams(updatedFilters).toString()
+    console.log('Query Parameters:', queryParams)
+    dispatch(fetchBooks(queryParams))
+  }
+
+  useEffect(() => {
+    fetchBooksWithPagination()
+  }, [id, type, itemsPerPage, currentPage])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [itemsPerPage])
+
+  const handlePageChange = newPage => {
+    setCurrentPage(newPage)
+    window.scrollTo({ top: 0, behavior: 'smooth' }) // Scroll to top
+  }
+
+  useEffect(() => {
+    dispatch(fetchCategories())
+    dispatch(fetchAuthors())
+    dispatch(fetchPublishers())
+  }, [dispatch])
+
+  const handleSort = event => {
+    event.preventDefault()
+    setIsSortOpen(false)
+    const value = event.target.value
+    let field
+    let order
+
+    switch (value) {
+      case 'priceLowToHigh':
+        field = 'price'
+        order = 'asc'
+        break
+      case 'priceHighToLow':
+        field = 'price'
+        order = 'desc'
+        break
+      case 'discountHighToLow':
+        field = 'discountPercentage'
+        order = 'desc'
+        break
+      case 'discountLowToHigh':
+        field = 'discountPercentage'
+        order = 'asc'
+        break
+      case 'nameAsc':
+        field = 'title'
+        order = 'asc'
+        break
+      case 'nameDesc':
+        field = 'title'
+        order = 'desc'
+        break
+      default:
+        field = 'title'
+        order = 'asc'
+    }
+
+    const existingFilters =
+      JSON.parse(sessionStorage.getItem('filters')) || filters
+
+    const updatedFilters = { ...existingFilters, sort: field, sortOrder: order }
+    setFilters(updatedFilters)
+    sessionStorage.setItem('filters', JSON.stringify(updatedFilters))
+
+    const queryParams = []
+
+    for (const key in updatedFilters) {
+      if (updatedFilters[key] && updatedFilters[key].length > 0) {
+        if (Array.isArray(updatedFilters[key])) {
+          queryParams.push(`${key}=${updatedFilters[key].join(',')}`)
+        } else {
+          queryParams.push(`${key}=${updatedFilters[key]}`)
+        }
+      }
+    }
+    const queryString = queryParams.join('&')
+    dispatch(fetchBooks(queryString))
+  }
 
   const handleOutsideClick = (event, setState) => {
     if (event.target.id === 'modal-background') {
@@ -53,51 +146,118 @@ const Category = () => {
   }
 
   return (
-    <div className='bg-gray-100 relative'>
+    <div className='bg-gray-100 relative py-4'>
       <div className='container'>
-        <Navbar />
-        <div className='flex gap-4 justify-between pt-40'>
+        <div className='flex gap-4 pt-24 md:pt-40'>
           {/* Sidebar (Visible only on larger screens) */}
-          <div className='hidden md:block min-w-64'>
-            <Sidebar />
+          <div className='hidden md:block'>
+            <Sidebar filters={filters} setFilters={setFilters} />
           </div>
-
-          {/* Products Section */}
           <div className='flex-1'>
-            <div className='flex items-center justify-between'>
-              <div className='px-2'>
-                <h1 className='text-2xl font-semibold'>Story</h1>
-                <p>(Showing 1 to 60 of 10000 items)</p>
-              </div>
-              <div className='hidden md:flex items-center gap-4 pr-6'>
-                <div className='flex items-center gap-1 '>
-                  <BsSortUpAlt className='mt-[2px]' />
-                  <p>Sort By:</p>
+            {/* Products Section */}
+            <div className='flex-1'>
+              <div className='flex items-center justify-between'>
+                <div className='px-2'>
+                  {/* Breadcrumb */}
+                  <Breadcrumb
+                    items={[
+                      { label: 'Home', path: '/' },
+                      { label: 'Books', path: '/category' }
+                    ]}
+                  />
+                  {/* <h1 className='text-2xl font-semibold'>Story</h1>
+                   */}
+
+                  <p className='text-sm md:text-lg text-gray-600 mt-1'>
+                    {`Showing ${range.start} to ${range.end} of ${books.totalItems} items`}{' '}
+                  </p>
                 </div>
-                <select
-                  className='border px-4 py-2 rounded'
-                  onChange={() => setIsSortOpen(false)} // Auto-close on selection
-                >
-                  <option value=''>Sort By</option>
-                  <option value='priceLowToHigh'>Price: Low to High</option>
-                  <option value='priceHighToLow'>Price: High to Low</option>
-                  <option value='discountHighToLow'>
-                    Discount: High to Low
-                  </option>
-                  <option value='discountLowToHigh'>
-                    Discount: Low to High
-                  </option>
-                  <option value='nameAsc'>Name: A to Z</option>
-                  <option value='nameDesc'>Name: Z to A</option>
-                </select>
+
+                {/* Items per page and sort options */}
+                <div className='flex items-center'>
+                  <div className='hidden md:flex items-center gap-4 pr-6'>
+                    <div className='flex items-center gap-1 '>
+                      <p>Items per page:</p>
+                    </div>
+                    <select
+                      className='border px-4 py-2 rounded'
+                      onChange={e => setItemsPerPage(parseInt(e.target.value))} // Auto-close on selection
+                    >
+                      <option value='20'>20</option>
+                      <option value='30'>30</option>
+                      <option value='40'>40</option>
+                      <option value='50'>50</option>
+                      <option value='60'>60</option>
+                      <option value='80'>80</option>
+                    </select>
+                  </div>
+                  <div className='hidden md:flex items-center gap-4 pr-6'>
+                    <div className='flex items-center gap-1 '>
+                      <BsSortUpAlt className='mt-[2px]' />
+                      <p>Sort By:</p>
+                    </div>
+                    <select
+                      className='border px-4 py-2 rounded'
+                      onChange={e => handleSort(e)} // Auto-close on selection
+                    >
+                      <option value=''>Sort By</option>
+                      <option value='priceLowToHigh'>Price: Low to High</option>
+                      <option value='priceHighToLow'>Price: High to Low</option>
+                      <option value='discountHighToLow'>
+                        Discount: High to Low
+                      </option>
+                      <option value='discountLowToHigh'>
+                        Discount: Low to High
+                      </option>
+                      <option value='nameAsc'>Name: A to Z</option>
+                      <option value='nameDesc'>Name: Z to A</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Products Grid */}
+              <div className='grid grid-cols-2 gap-2 sm:flex justify-items-center sm:gap-4 flex-wrap mt-2 sm:mt-8'>
+                {books.data &&
+                  books.data.map((book, i) => (
+                    <ProductCard key={i} book={book} />
+                  ))}
               </div>
             </div>
 
-            {/* Products Grid */}
-            <div className='grid grid-cols-2 gap-2 sm:flex justify-items-center sm:gap-4 flex-wrap mt-2 sm:mt-8'>
-              {[...Array(30)].map((_, index) => (
-                <ProductCard key={index} />
-              ))}
+            {/* Pagination Buttons */}
+            <div className='flex justify-center mt-6'>
+              {totalPages > 1 && (
+                <div className='flex items-center gap-2'>
+                  <button
+                    className='border px-4 py-2 rounded bg-gray-200 hover:bg-gray-300'
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  >
+                    Previous
+                  </button>
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index}
+                      className={`border px-4 py-2 rounded ${
+                        currentPage === index + 1
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-200 hover:bg-gray-300'
+                      }`}
+                      onClick={() => handlePageChange(index + 1)}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  <button
+                    className='border px-4 py-2 rounded bg-gray-200 hover:bg-gray-300'
+                    disabled={currentPage === books.totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -139,17 +299,13 @@ const Category = () => {
             className='bg-white rounded-lg p- w-full h-[85%] overflow-y-scroll relative '
             onClick={e => e.stopPropagation()} // Prevent modal close on content click
           >
-            <h2 className='text-lg w-full font-semibold mb-4 text-center bg-white fixed py-2 border-b border-b-gray-300 flex justify-center items-center gap-2'>
+            <h2 className='text-lg w-full font-semibold mb-4 text-center bg-white fixed py-2 border-b border-b-gray-300 flex justify-center items-center gap-2 z-50'>
               <LuListFilter />
               Filter Options
             </h2>
 
-            <div className='flex flex-col gap-2 pt-12 items-center'>
-              <SelectFilter title='Categories' options={categories} />
-              <SelectFilter title='Authors' options={authors} />
-              <SelectFilter title='Publishers' options={publishers} />
-              <SelectFilter title='Languages' options={languages} />
-              <ReviewFilter />
+            <div className='flex flex-col gap-2 pt-12 items-center z-50'>
+              <Sidebar filters={filters} setFilters={setFilters} />
             </div>
           </div>
         </div>
@@ -169,7 +325,8 @@ const Category = () => {
             <h2 className='text-lg font-semibold mb-4'>Sort Options</h2>
             <select
               className='border w-full px-4 py-2 rounded'
-              onChange={() => setIsSortOpen(false)} // Auto-close on selection
+              onChange={e => handleSort(e)}
+              // Auto-close on selection
             >
               <option value=''>Sort By</option>
               <option value='priceLowToHigh'>Price: Low to High</option>

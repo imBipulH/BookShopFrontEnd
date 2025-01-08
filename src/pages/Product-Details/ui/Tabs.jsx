@@ -20,7 +20,7 @@ const TabButton = ({ label, isActive, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className={` w-fit text-center px-6 py-2 rounded-t-lg ${
+      className={`w-full md:w-fit text-center px-6 py-2 rounded-t-lg ${
         isActive
           ? 'bg-white font-semibold border-primary  border-t-4 border-x-2 bg-gradient-to-b from-sky-200 to-transparent'
           : 'hover:border-sky3 border border-transparent border-b-1 border-b-sky-300'
@@ -34,7 +34,7 @@ const TabButton = ({ label, isActive, onClick }) => {
 const TabButtonTwo = ({ label, isActive, onClick }) => {
   return (
     <button
-      className={`w-fit py-2 px-6 text-center rounded-t-lg ${
+      className={`w-full md:w-fit py-2 px-6 text-center rounded-t-lg ${
         isActive
           ? 'bg-white font-semibold border-primary  border-t-4 border-x-2 bg-gradient-to-b from-sky-100 to-transparent'
           : 'hover:border-sky3 border border-transparent border-b-1 border-b-sky-300'
@@ -72,7 +72,7 @@ const TabButtons = () => {
   }
 
   return (
-    <div className='flex justify-between bg-white mt-8 gap-8'>
+    <div className='flex flex-col md:flex-row justify-between bg-white mt-8 gap-8'>
       {/* Left Column: Accordion */}
       <div className='w-full border-gray-300 rounded-md'>
         <div className='flex justify-start'>

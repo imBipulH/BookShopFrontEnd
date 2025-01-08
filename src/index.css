@@ -49,3 +49,9 @@
   margin: 0; /* Removes default margin */
 }
 
+.responsive-title {
+  font-size: clamp(12px, 2.5vw, 16px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

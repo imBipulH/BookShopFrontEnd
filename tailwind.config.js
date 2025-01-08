@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 /** @type {import('tailwindcss').Config} */
+import scrollbar from 'tailwind-scrollbar'
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
@@ -18,6 +19,9 @@ export default {
       roboto: ['Roboto', 'sans-serif', 'system-ui']
     },
     extend: {
+      fontSize: {
+        responsive: 'clamp(10px, 0.4vw, 14px)'
+      },
       colors: {
         global_bg: '#F3F4F6',
         primary: '#0ea5e9',
@@ -36,5 +40,5 @@ export default {
       }
     }
   },
-  plugins: [require('tailwind-scrollbar'), require('@tailwindcss/line-clamp')]
+  plugins: [scrollbar]
 }
