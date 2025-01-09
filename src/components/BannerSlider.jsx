@@ -2,6 +2,9 @@ import Autoplay from 'embla-carousel-autoplay'
 import useEmblaCarousel from 'embla-carousel-react'
 import { useCallback, useEffect, useState } from 'react'
 import { LeftArrow, RightArrow } from './ui/LeftArrow'
+import Banner1 from '../../src/assets/banner1.jpg'
+import Banner2 from '../../src/assets/banner2.png'
+import Banner3 from '../../src/assets/banner3.png'
 
 export default function EmblaCarousel () {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
@@ -42,20 +45,20 @@ export default function EmblaCarousel () {
       <div className='embla relative my-4' ref={emblaRef}>
         <div className='embla__container'>
           <div className='embla__slide border border-red-300 h-60 flex items-center justify-center'>
-            <img src='../../src/assets/banner1.jpg' />
+            <img src={Banner1} />
           </div>
           <div className='embla__slide border border-red-300 h-60 flex items-center justify-center'>
-            <img src='../../src/assets/banner2.png' />
+            <img src={Banner2} />
           </div>
           <div className='embla__slide border border-red-300 h-60 flex items-center justify-center'>
-            <img src='../../src/assets/banner3.png' />
+            <img src={Banner3} />
           </div>
         </div>
         <LeftArrow onClick={scrollPrev} />
         <RightArrow onClick={scrollNext} />
       </div>
       {/* Dots */}
-      <div className='dots flex justify-center mt-4'>
+      <div className='dots flex justify-center mb-2 md:mb-10'>
         {Array.from({ length: slidesCount }).map((_, index) => (
           <button
             key={index}
