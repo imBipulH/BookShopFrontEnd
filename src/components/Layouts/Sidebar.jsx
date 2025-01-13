@@ -148,7 +148,7 @@ const Sidebar = memo(({ filters, setFilters }) => {
     sessionStorage.setItem('filters', JSON.stringify(updatedFilters)) // Update sessionStorage
 
     if (type && id) {
-      navigate('/category')
+      navigate('/books')
     }
 
     await getBooks()

@@ -23,7 +23,7 @@ const AllCategories = () => {
             {categories.map(category => (
               <Link
                 key={category?._id}
-                to={`/category/categories/${category._id}`}
+                to={`/books/categories/${category._id}`}
               >
                 <li className='flex md:min-w-52 md:max-w-64 flex-col items-center border py-2 md:py-6 px-2 bg-white hover:bg-sky-200 cursor-pointer'>
                   <h2 className='text-base md:text-2xl line-clamp-1 text-ellipsis'>

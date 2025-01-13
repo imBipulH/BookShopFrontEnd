@@ -5,19 +5,20 @@ function Footer () {
   return (
     <footer className='bg-gradient-to-br from-white-100 to-white-300 py-12 relative z-10'>
       <div className='container mx-auto bg-white rounded-lg p-8'>
-        <div className='flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0'>
+        <div className='flex flex-wrap md:flex-row justify-between items-center space-y-8 md:space-y-0'>
           {/* Logo and Trust Info */}
-          <div className='text-center md:text-left'>
-            <Link to='/'>
-              <div className='flex items-center space-x-1'>
-                <div className='font-bold text-base sm:text-xl text-sky-600'>
-                  JISANBOOK
-                </div>
-                <span className='text-gray-500'>.com</span>
+          <div className='w-full md:w-fit text-center  md:text-left'>
+            <Link
+              to='/'
+              className='flex md:justify-start justify-center items-center space-x-1'
+            >
+              <div className='font-bold text-base sm:text-xl text-sky-600'>
+                JISANBOOK
               </div>
+              <span className='text-gray-500'>.com</span>
             </Link>
 
-            <div className='flex items-center mt-2'>
+            <div className='flex items-center justify-center md:justify-start mt-2'>
               <span className='text-gray-500 text-sm font-semibold'>
                 TrustScore
               </span>
@@ -34,9 +35,11 @@ function Footer () {
           </div>
 
           {/* Company Section */}
-          <div>
-            <h3 className='text-lg font-bold mb-4 text-indigo-600'>Company</h3>
-            <ul className='space-y-2 text-gray-700'>
+          <div className='mx-auto '>
+            <h3 className='text-lg font-bold mb-4 text-center md:text-start text-indigo-600'>
+              Company
+            </h3>
+            <ul className='space-y-2 text-center md:text-start text-gray-700'>
               {['Home', 'Our Story', 'Blog', 'Contact Us'].map(
                 (item, index) => (
                   <li
@@ -53,9 +56,11 @@ function Footer () {
           </div>
 
           {/* Orders Section */}
-          <div>
-            <h3 className='text-lg font-bold mb-4 text-indigo-600'>Orders</h3>
-            <ul className='space-y-2 text-gray-700'>
+          <div className=' mx-auto'>
+            <h3 className='text-lg text-center md:text-start font-bold mb-4 text-indigo-600'>
+              Orders
+            </h3>
+            <ul className='space-y-2 text-center md:text-start text-gray-700'>
               {[
                 'My Orders',
                 'Refund Policy',
@@ -75,11 +80,11 @@ function Footer () {
           </div>
 
           {/* Resources Section */}
-          <div>
-            <h3 className='text-lg font-bold mb-4 text-indigo-600'>
+          <div className=' mx-auto'>
+            <h3 className='text-lg font-bold mb-4 text-center md:text-start text-indigo-600'>
               Resources
             </h3>
-            <ul className='space-y-2 text-gray-700'>
+            <ul className='space-y-2 text-center md:text-start text-gray-700'>
               {[
                 'Why do Customers Love Us',
                 'Redeem Argentina and Turkey',

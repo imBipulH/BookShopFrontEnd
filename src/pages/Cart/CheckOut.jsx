@@ -9,9 +9,10 @@ import { IoMdCash } from 'react-icons/io'
 import { FaCreditCard, FaWallet } from 'react-icons/fa'
 import CheckoutSummery from '../../components/ui/checkout/CheckoutSummery'
 import Products from '../../components/ui/checkout/Products'
-// import bkashLogo from '../../../src/assets/bkash.png'
-// import nagadLogo from '../../../src/assets/nagad.png'
-// import rocketLogo from '../../../src/assets/rocket.png'
+import bkashLogo from '../../../src/assets/bkash.png'
+import nagadLogo from '../../../src/assets/nagad.png'
+import rocketLogo from '../../../src/assets/rocket.png'
+import { createOrder } from '../../store/shop/orderSlice'
 // import sslCardsLogo from '../../../src/assets/rok-ssl-card-icon.png.png'
 
 const FloatingLabelInput = ({ label, type, placeholder }) => {
@@ -45,28 +46,27 @@ const CheckoutPage = () => {
   const dispatch = useDispatch()
   const [selectedAddressId, setSelectedAddressId] = useState('')
   const [selectedAddress, setSelectedAddress] = useState('')
+  const [orderNotes, setOrderNotes] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const addresses = useSelector(selectAddresses)
   const { cart } = useSelector(state => state.cart)
 
-  
   console.log(selectedAddress)
 
-
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card')
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Card')
   const [selectedWallet, setSelectedWallet] = useState('')
 
   const walletOptions = [
-    { name: 'bKash', color: 'bg-red-100', img: '../../src/assets/bkash.png' },
+    { name: 'bKash', color: 'bg-red-100', img: bkashLogo },
     {
       name: 'Nagad',
       color: 'bg-orange-100',
-      img: '../../src/assets/nagad.png'
+      img: nagadLogo
     },
     {
       name: 'Rocket',
       color: 'bg-purple-100',
-      img: '../../src/assets/rocket.png'
+      img: rocketLogo
     }
   ]
 
@@ -80,8 +80,6 @@ const CheckoutPage = () => {
       window.removeEventListener('resize', handleResize)
     }
   }, [])
-
-  console.log(windowWidth)
 
   const PaymentButton = ({ onClick, icon, title, name }) => {
     return (
@@ -111,12 +109,46 @@ const CheckoutPage = () => {
     return `${address.name}, ${address.phone}, ${address.city}, ${address.country}, ${address.addressDetails}`
   }
 
-  console.log(cart)
-
   const handleAddressSelect = selectedAddressId => {
     setSelectedAddressId(selectedAddressId)
     const addressData = addresses.find(addr => addr._id === selectedAddressId)
     setSelectedAddress(formatAddress(addressData))
+  }
+
+  const handleConfirmOrder = () => {
+    if (!selectedAddressId) {
+      alert('Please select an address')
+      return
+    }
+    if (!cart || cart.length === 0 || !cart?.some(item => item.isMarked)) {
+      alert('No items selected for checkout')
+      return
+    }
+
+    const markedItems = cart.filter(item => item.isMarked)
+
+    const orderData = {
+      shippingAddressId: selectedAddressId,
+      items: markedItems.map(item => ({
+        productId: item._id,
+        quantity: item.quantity
+      })),
+      paymentMethod: selectedPaymentMethod,
+      wallet: selectedPaymentMethod === 'Wallet' ? selectedWallet : null,
+      orderNotes: orderNotes
+    }
+    console.log('orderData', orderData)
+
+    dispatch(createOrder(orderData))
+      .unwrap()
+      .then(response => {
+        alert('Order placed successfully')
+        console.log(response)
+      })
+      .catch(error => {
+        console.error(error)
+        alert(`Failed to place order: ${error.message}`)
+      })
   }
 
   return (
@@ -180,19 +212,19 @@ const CheckoutPage = () => {
           </h4>
           <div className='grid grid-cols-3 gap-1'>
             <PaymentButton
-              name='card'
+              name='Card'
               title='Credit/Debit Card'
               icon={<FaCreditCard className='text-2xl' />}
-              onClick={() => setSelectedPaymentMethod('card')}
+              onClick={() => setSelectedPaymentMethod('Card')}
             />
             <PaymentButton
-              name='wallet'
+              name='Wallet'
               title='Mobile Wallet'
               icon={<FaWallet className='text-2xl' />}
-              onClick={() => setSelectedPaymentMethod('wallet')}
+              onClick={() => setSelectedPaymentMethod('Wallet')}
             />
             <PaymentButton
-              name='cod'
+              name='Cash-on-delivery'
               title='Cash on delivery'
               icon={
                 <IoMdCash className='text-3xl' />
@@ -201,13 +233,13 @@ const CheckoutPage = () => {
                 //   className='h-6'
                 // />
               }
-              onClick={() => setSelectedPaymentMethod('cod')}
+              onClick={() => setSelectedPaymentMethod('Cash-on-delivery')}
             />
           </div>
         </div>
 
         {/* Card Payment Form */}
-        {selectedPaymentMethod === 'card' && (
+        {selectedPaymentMethod === 'Card' && (
           <div className=' bg-[#F0F9FF] p-2 rounded-md shadow-md'>
             <h4 className='font-semibold text-center mb-1 text-base'>
               Card Payment Details
@@ -231,7 +263,7 @@ const CheckoutPage = () => {
         )}
 
         {/* Mobile Wallet Form Options */}
-        {selectedPaymentMethod === 'wallet' && (
+        {selectedPaymentMethod === 'Wallet' && (
           <div className='bg-[#F0F9FF] p-2 rounded-md shadow-md'>
             <h4 className='font-semibold text-center mb-2 text-lg'>
               Choose Your Mobile Wallet
@@ -259,7 +291,7 @@ const CheckoutPage = () => {
         )}
 
         {/* Cash on Delivery */}
-        {selectedPaymentMethod === 'cod' && (
+        {selectedPaymentMethod === 'Cash-on-delivery' && (
           <div className=' bg-[#F0F9FF] p-2 rounded-md shadow-md'>
             <h4 className='font-semibold text-center text-base'>
               Cash on Delivery
@@ -277,6 +309,7 @@ const CheckoutPage = () => {
             Order Notes (Optional)
           </h2>
           <textarea
+            onChange={e => setOrderNotes(e.target.value)}
             placeholder='Add any special instructions here...'
             className='w-full p-2 mb-1 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-sky-500'
             rows='2'
@@ -287,7 +320,10 @@ const CheckoutPage = () => {
       {windowWidth < 768 && <CheckoutSummery cart={cart} />}
 
       {/* Confirm Order */}
-      <button className='bg-sky-600 hidden md:block text-white py-3 px-6 rounded-md w-full'>
+      <button
+        onClick={handleConfirmOrder}
+        className='bg-sky-600 hidden md:block text-white py-3 px-6 rounded-md w-full'
+      >
         Confirm Order
       </button>
 

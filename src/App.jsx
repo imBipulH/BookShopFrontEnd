@@ -18,6 +18,7 @@ import CheckoutPage1 from './pages/Cart/Checkout[1]'
 import Authors from './pages/Categories_Breaksdown/Authors'
 import AllCategories from './pages/Categories_Breaksdown/AllCategories'
 import Publishers from './pages/Categories_Breaksdown/Publishers'
+import MyOrders from './pages/Profile/MyOrders'
 
 function App () {
   const dispatch = useDispatch()
@@ -33,7 +34,7 @@ function App () {
         <Route path='/registration' element={<Registration />} />
         <Route path='/verify-email' element={<VerifyEmail />} />
         <Route path='/ForgetPassword' element={<ForgetPassword />} />
-        <Route path='/category/:type?/:id?' element={<Category />} />
+        <Route path='/books/:type?/:id?' element={<Category />} />
         <Route path='/book/:bookId' element={<Product_Details />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='/wish-list' element={<WishList />} />
@@ -42,6 +43,7 @@ function App () {
         <Route path='/authors' element={<Authors />} />
         <Route path='/allcategories' element={<AllCategories />} />
         <Route path='/publishers' element={<Publishers />} />
+        <Route path='/my-orders' element={<MyOrders />} />
       </Routes>
     </Layout>
   )

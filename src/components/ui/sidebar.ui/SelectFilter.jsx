@@ -1,14 +1,20 @@
 /* eslint-disable react/display-name */
 /* eslint-disable react/prop-types */
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { LuFilterX } from 'react-icons/lu'
 import { RxCross2 } from 'react-icons/rx'
 
 const SelectFilter = memo(
   ({ title, options, filters, handleFilter, handleReset, getBooks }) => {
     const [searchQuery, setSearchQuery] = useState('')
-    // const filterValues = filters[title.toLowerCase()] || [];
-    // Handle Search Input Change
+    const [forceUpdate, setForceUpdate] = useState(false)
+
+    useEffect(() => {
+      setForceUpdate(!forceUpdate) // Toggle the forceUpdate state to trigger a re-render
+    }, [filters])
+
+    console.log(`Rendering ${title} - Filters:`, filters)
+
     const handleSearchChange = e => {
       const query = e.target.value.toLowerCase()
       setSearchQuery(query)
@@ -25,7 +31,7 @@ const SelectFilter = memo(
       setSearchQuery('')
     }
 
-    // console.log(`Rendering ${title}`)
+    console.log(`Rendering ${filters}`)
 
     const filteredOptions = options
       .filter(option => option.name.toLowerCase().includes(searchQuery))

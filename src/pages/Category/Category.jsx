@@ -12,6 +12,7 @@ import {
 } from '../../store/shop/sidebarSlice'
 import Breadcrumb from './Breadcumb'
 import { useParams } from 'react-router-dom'
+import { languages } from '../../components/Data'
 
 const Category = () => {
   const dispatch = useDispatch()
@@ -145,6 +146,52 @@ const Category = () => {
     }
   }
 
+  const { categories, authors, publishers } = useSelector(
+    state => state.sidebar
+  )
+
+  const dataByType = {
+    categories,
+    authors,
+    publishers,
+    languages
+  }
+
+  const getNamesFromIds = (ids, type) => {
+    const data = dataByType[type]
+    if (!Array.isArray(data)) {
+      return []
+    }
+    return ids
+      .map(id => data?.find(item => item._id === id)?.name)
+      .filter(Boolean) // Removes undefined if the ID doesn't match
+  }
+
+  const breadcrumbItems = [
+    { label: 'Home', path: '/' },
+    { label: 'Books', path: '/books' },
+    ...Object.keys(filters).flatMap(type =>
+      getNamesFromIds(filters[type], type).map(name => ({
+        label: name,
+        type
+      }))
+    )
+  ]
+
+  const handleFilterRemove = (type, name) => {
+    const updatedFilters = {
+      ...filters,
+      [type]: filters[type].filter(
+        id => getNamesFromIds([id], type)[0] !== name
+      )
+    }
+
+    // Update the state and storage
+    setFilters(updatedFilters)
+    sessionStorage.setItem('filters', JSON.stringify(updatedFilters))
+    fetchBooksWithPagination() // Update the books list
+  }
+
   return (
     <div className='bg-gray-100 relative py-4'>
       <div className='container'>
@@ -158,16 +205,15 @@ const Category = () => {
             <div className='flex-1'>
               <div className='flex items-center justify-between'>
                 <div className='px-2'>
-                  {/* Breadcrumb */}
                   <Breadcrumb
-                    items={[
-                      { label: 'Home', path: '/' },
-                      { label: 'Books', path: '/category' }
-                    ]}
+                    items={breadcrumbItems}
+                    onRemove={label => {
+                      const filterType = breadcrumbItems.find(
+                        item => item.label === label
+                      )?.type
+                      if (filterType) handleFilterRemove(filterType, label)
+                    }}
                   />
-                  {/* <h1 className='text-2xl font-semibold'>Story</h1>
-                   */}
-
                   <p className='text-sm md:text-lg text-gray-600 mt-1'>
                     {`Showing ${range.start} to ${range.end} of ${books.totalItems} items`}{' '}
                   </p>
@@ -183,8 +229,8 @@ const Category = () => {
                       className='border px-4 py-2 rounded'
                       onChange={e => setItemsPerPage(parseInt(e.target.value))} // Auto-close on selection
                     >
-                      <option value='20'>20</option>
                       <option value='30'>30</option>
+                      <option value='20'>20</option>
                       <option value='40'>40</option>
                       <option value='50'>50</option>
                       <option value='60'>60</option>
@@ -217,7 +263,7 @@ const Category = () => {
               </div>
 
               {/* Products Grid */}
-              <div className='grid grid-cols-2 gap-2 sm:flex justify-items-center sm:gap-4 flex-wrap mt-2 sm:mt-8'>
+              <div className='grid grid-cols-2 gap-2 sm:flex flex-wrap justify-items-center md:gap-4 mt-2 md:mt-8'>
                 {books.data &&
                   books.data.map((book, i) => (
                     <ProductCard key={i} book={book} />

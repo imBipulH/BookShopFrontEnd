@@ -1,7 +1,7 @@
 import axios from 'axios'
 axios.defaults.withCredentials = true
-const BASE_URL = 'http://147.93.31.52:8000/'
-// const BASE_URL = 'http://localhost:8000/'
+// const BASE_URL = 'http://147.93.31.52:8000/'
+const BASE_URL = 'http://localhost:8000/'
 //  const BASE_URL = 'https://c936a7fbe94e35eda918d4fd2837d037.serveo.net/'
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -15,8 +15,8 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   config => {
-    // const cookies = document.cookie.split(';')
-    //  console.log(document.cookie, cookies, 'cookies')
+    const cookies = document.cookie.split(';')
+    console.log(document.cookie, cookies, 'cookies')
     // let token = null
     // cookies.forEach(cookie => {
     //   if (cookie.trim().startsWith('token=')) {

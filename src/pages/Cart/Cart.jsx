@@ -17,7 +17,7 @@ import {
   updateCartItemQuantity,
   updateItemSelection
 } from '../../store/shop/cartSlice'
-import Footer from '../../components/Layouts/Footer'
+
 import { Link } from 'react-router-dom'
 
 const CartItems = React.memo(({ item, handleDelete }) => {
@@ -302,7 +302,6 @@ const Cart = () => {
             </Link>
           </div>
         </div>
-        <Footer />
       </div>
     </div>
   )

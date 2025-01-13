@@ -31,11 +31,11 @@ const ProductCard = ({ book, rating = 4, className }) => {
 
   return (
     <div
-      className={`bg-white rounded-md p-2 max-w-60 min-w-44 sm:w-52 border cursor-pointer group relative ${className}`}
+      className={`bg-white rounded-md p-2 w-1/2 max-w-60 min-w-44 sm:w-52 border cursor-pointer group relative ${className}`}
     >
       <Link to={`/book/${book?._id}`}>
         <div className=' bg-sky-50 hover:shadow-md h-36 overflow-hidden relative'>
-          <div className='flex justify-center h-full w-full '>
+          <div className='flex justify-center h-full md:w-full '>
             <img
               className='h-full group-hover:scale-110 transition-all duration-300'
               src={

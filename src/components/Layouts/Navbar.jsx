@@ -17,6 +17,12 @@ import {
 } from '../../store/shop/searchSlice'
 import Suggestions from './ui/Suggestions'
 import { fetchBooks } from '../../store/shop/bookSlice'
+import {
+  fetchAuthors,
+  fetchCategories,
+  fetchPublishers
+} from '../../store/shop/sidebarSlice'
+import { IoMdArrowDropdown } from 'react-icons/io'
 const Navbar = () => {
   const dispatch = useDispatch()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -26,6 +32,20 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedTerm, setDebouncedTerm] = useState('')
   const { suggestions, fuseResults } = useSelector(state => state?.search)
+  const [hoveredCategory, setHoveredCategory] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(true)
+  const [modalData, setModalData] = useState([])
+
+  useEffect(() => {
+    dispatch(fetchCategories())
+    dispatch(fetchAuthors())
+    dispatch(fetchPublishers())
+  }, [dispatch])
+
+  const { categories } = useSelector(state => state?.sidebar)
+  const { authors } = useSelector(state => state?.sidebar)
+  const { publishers } = useSelector(state => state?.sidebar)
+
   // console.log(suggestions, 'FuseResults', fuseResults)
 
   // Get window width
@@ -94,19 +114,55 @@ const Navbar = () => {
     }
   }
 
-  const categories = [
-    { label: 'সকল বই', link: '/category' },
-    { label: 'ধরন', link: '/category' },
-    { label: 'বিষয়', link: '/allcategories' },
-    { label: 'প্রকাশনী', link: '/publishers' },
-    { label: 'লেখক', link: '/authors' },
-    { label: 'ই-বুক', link: '/category' },
-    { label: 'HSC ও ভর্তি প্রস্তুতি', link: '/category' },
-    { label: 'ইসলামী বই', link: '/category' },
-    { label: 'ইংরেজি ভাষার বই', link: '/category' },
-    { label: 'পশ্চিমাদের বই', link: '/category' }
+  const categoriesHead = [
+    { _id: 1, label: 'সকল বই', link: '/books' },
+    { _id: 2, label: 'ধরন', link: '/books' },
+    { _id: 3, label: 'বিষয়', link: '/allcategories' },
+    { _id: 4, label: 'প্রকাশনী', link: '/publishers' },
+    { _id: 5, label: 'লেখক', link: '/authors' },
+    { _id: 6, label: 'ই-বুক', link: '/books' },
+    { _id: 7, label: 'HSC ও ভর্তি প্রস্তুতি', link: '/books' },
+    { _id: 8, label: 'ইসলামী বই', link: '/books' },
+    { _id: 9, label: 'ইংরেজি ভাষার বই', link: '/books' },
+    { _id: 10, label: 'পশ্চিমাদের বই', link: '/books' }
     // { label: 'অডিও বই', link: '/category' }
   ]
+
+  const handleMouseEnterCategory = category => {
+    setIsModalOpen(false)
+    if (category === 'বিষয়') {
+      setIsModalOpen(true)
+      setHoveredCategory('categories')
+      setModalData(categories)
+    }
+    if (category === 'প্রকাশনী') {
+      setIsModalOpen(true)
+      setHoveredCategory('publishers')
+      setModalData(publishers)
+    }
+    if (category === 'লেখক') {
+      setIsModalOpen(true)
+      setHoveredCategory('authors')
+      setModalData(authors)
+    }
+  }
+  const handleMouseLeaveCategory = () => {
+    if (isModalOpen) {
+      setTimeout(() => {
+        if (!isModalOpen) {
+          setHoveredCategory(null)
+        }
+      }, 100)
+    }
+  }
+  const handleMouseEnterModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleMouseLeaveModal = () => {
+    setIsModalOpen(false)
+    setHoveredCategory(null)
+  }
 
   // Ref for horizontal scrolling
   const categoryRef = useRef(null)
@@ -242,7 +298,7 @@ const Navbar = () => {
                     </li>
                     <li>
                       <a
-                        href='/my-wishlist'
+                        href='/wish-list'
                         className='block text-gray-800 hover:text-gray-500'
                       >
                         My Wishlist
@@ -299,7 +355,7 @@ const Navbar = () => {
           }`}
         >
           <ul className='space-y-2 p-4'>
-            {categories.map((category, index) => (
+            {categoriesHead.map((category, index) => (
               <li key={index}>
                 <Link
                   to={category.link}
@@ -332,16 +388,46 @@ const Navbar = () => {
             </button>
             <div
               ref={categoryRef}
-              to='/category'
               className='flex space-x-4 overflow-hidden py-2'
             >
-              {categories?.map((category, index) => (
+              {categoriesHead?.map((category, index) => (
                 <Link
-                  key={index}
                   to={category.link}
-                  className='flex-shrink-0 py-2 px-4 bg-white border border-gray-300 rounded hover:bg-sky-600 hover:text-white transition'
+                  key={index}
+                  onMouseEnter={() => handleMouseEnterCategory(category.label)}
+                  onMouseLeave={handleMouseLeaveCategory}
+                  className='flex-shrink-0 '
                 >
-                  {category.label}
+                  <p className=' py-2 px-4 bg-white border border-gray-300 rounded hover:bg-sky-600 hover:text-white transition flex items-center gap-1'>
+                    {category.label}
+                    {['বিষয়', 'প্রকাশনী', 'লেখক'].includes(category.label) && (
+                      <IoMdArrowDropdown />
+                    )}
+                  </p>
+                  {hoveredCategory && isModalOpen && (
+                    <div
+                      onMouseEnter={handleMouseEnterModal}
+                      onMouseLeave={handleMouseLeaveModal}
+                      className='absolute top-[100%] left-0 w-full bg-gray-100 py-2 px-10 md:min-h-44 rounded'
+                    >
+                      <ul className='flex flex-wrap gap-4 py-1'>
+                        {modalData?.map(item => (
+                          <Link
+                            key={item._id}
+                            onClick={() => setIsModalOpen(false)}
+                            to={`/books/${hoveredCategory}/${item._id}`}
+                          >
+                            <li
+                              key={item._id}
+                              className='px-4 py-1 min-w-fit bg-white  hover:bg-sky-200 transition border rounded-full'
+                            >
+                              {` ${item?.name}`}
+                            </li>
+                          </Link>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </Link>
               ))}
             </div>

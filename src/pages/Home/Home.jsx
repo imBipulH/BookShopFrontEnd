@@ -11,7 +11,10 @@ import { Link } from 'react-router-dom'
 
 // Reusable Embla Carousel Component
 const EmblaCarousel = ({ categories }) => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start' })
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
+    skipSnaps: false
+  })
   const [canScrollPrev, setCanScrollPrev] = useState(false)
   const [canScrollNext, setCanScrollNext] = useState(false)
 
@@ -41,13 +44,18 @@ const EmblaCarousel = ({ categories }) => {
   return (
     <div className='embla relative '>
       <div
-        className='embla__viewport flex justify-start gap-4 my-8'
+        className='embla__viewport flex justify-start gap-2 md:gap-4 my-2 md:my-8 px-4'
         ref={emblaRef}
       >
-        <div className='flex gap-4'>
+        <div className='flex gap-4 '>
           {categories.map((category, index) => (
             <CategoryCard key={index} category={category} />
           ))}
+          <div
+            className={`md:w-0 md:px-0 py-2 embla__slide__category flex flex-col justify-between md:flex-none  h-full text-transparent`}
+          >
+            This is another category
+          </div>
         </div>
       </div>
       {canScrollPrev && <LeftArrow onClick={scrollPrev} className='left-0' />}
@@ -96,19 +104,22 @@ const Home = () => {
   return (
     <div className='bg-white'>
       <div className='container bg-white'>
-        <div className='pt-44 '>
+        <div className='pt-8 md:pt-44 '>
           <BannerSlider />
-          <div className='bg-sky-500 grid grid-cols-6  rounded-xl'>
+          <div className='md:bg-sky-500 grid grid-cols-3 md:grid-cols-6 rounded-xl'>
             {HomePageSixCategory.map(category => (
               <Link
                 to={`/category/categories/${category._id}`}
                 key={category._id}
-                className='flex flex-col gap-4 py-4 items-center hover:bg-sky-400 cursor-pointer rounded-xl'
+                className='flex flex-col gap-1 md:gap-4 py-2 border md:border-none md:py-4 items-center bg-sky-500  hover:bg-sky-400 cursor-pointer rounded-md md:rounded-xl'
               >
-                <div className='w-32 p-1 aspect-square rounded-full bg-white text-center flex items-center justify-center'>
-                  <img src={category.image} className='object-cover h-24' />
+                <div className='w-16 md:w-32 p-1 aspect-square rounded-full bg-white text-center flex items-center justify-center'>
+                  <img
+                    src={category.image}
+                    className='object-cover h-10 md:h-24'
+                  />
                 </div>
-                <h2 className='text-md md:text-xl text-white'>
+                <h2 className='text-sm md:text-xl text-white'>
                   {category.name}
                 </h2>
               </Link>
@@ -119,17 +130,20 @@ const Home = () => {
           ))}
         </div>
 
-        <div className='bg-sky-500 grid grid-cols-6  rounded-xl'>
+        <div className='md:bg-sky-500 grid grid-cols-3 md:grid-cols-6 rounded-xl'>
           {HomePageSixCategory.map(category => (
             <Link
               to={`/category/categories/${category._id}`}
               key={category._id}
-              className='flex flex-col gap-4 py-4 items-center hover:bg-sky-400 cursor-pointer rounded-xl'
+              className='flex flex-col gap-1 md:gap-4 py-2 border md:border-none md:py-4 items-center bg-sky-500  hover:bg-sky-400 cursor-pointer rounded-md md:rounded-xl'
             >
-              <div className='w-32 p-1 aspect-square rounded-full bg-white text-center flex items-center justify-center'>
-                <img src={category.image} className='object-cover h-24' />
+              <div className='w-16 md:w-32 p-1 aspect-square rounded-full bg-white text-center flex items-center justify-center'>
+                <img
+                  src={category.image}
+                  className='object-cover h-10 md:h-24'
+                />
               </div>
-              <h2 className='text-md md:text-xl text-white'>{category.name}</h2>
+              <h2 className='text-sm md:text-xl text-white'>{category.name}</h2>
             </Link>
           ))}
         </div>

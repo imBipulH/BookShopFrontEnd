@@ -19,7 +19,7 @@ const Authors = () => {
           <h1 className='text-center w-full md:text-3xl'>সকল লেখকগণ</h1>
           <ul className='grid grid-cols-2 px-2 md:flex flex-wrap gap-2 md:gap-4 mt-2 md:mt-8'>
             {authors.map(author => (
-              <Link key={author?._id} to={`/category/authors/${author._id}`}>
+              <Link key={author?._id} to={`/books/authors/${author._id}`}>
                 <li className='flex md:min-w-52 md:max-w-64 flex-col items-center border py-2 md:py-6 px-2 bg-white hover:bg-sky-200 cursor-pointer'>
                   <img
                     src={author?.image || '../../../src/assets/photo.jpeg'}

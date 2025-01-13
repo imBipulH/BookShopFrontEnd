@@ -51,7 +51,7 @@ const Product_Details = () => {
         {/* Product details start */}
         <div className='bg-white'>
           <div className='flex flex-col md:flex-row pt-44 gap-4 justify-between'>
-            <div className='border p-4 mx-4 md:max-h-[460px]'>
+            <div className='border p-4 mx-4 md:max-h-[460px] md:min-w-[350px]'>
               {book?.coverImage ? (
                 <img
                   src={book?.coverImage}
