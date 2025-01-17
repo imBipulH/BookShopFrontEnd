@@ -5,11 +5,11 @@ import { TiTick } from 'react-icons/ti'
 import { StarRating } from '../../components/ui/StarRating'
 import { SimilarProduct } from '../../components/ui/SimilarProduct'
 import { useEffect, useRef, useState } from 'react'
-import { MyDocument } from '../../components/ui/PdfView'
 import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchBookById } from '../../store/shop/bookSlice'
 import { addToCart } from '../../store/shop/cartSlice'
+import { addItemToWishlist } from '../../store/shop/wishListSlice'
 
 const Product_Details = () => {
   const { bookId } = useParams()
@@ -27,6 +27,10 @@ const Product_Details = () => {
   const [openModal, setOpenModal] = useState(false)
   const modalRef = useRef(null)
 
+  const handleAddToWishlist = id => {
+    dispatch(addItemToWishlist(id))
+  }
+
   const handleAddToCart = () => {
     dispatch(addToCart({ productId: bookId, quantity: 1 }))
   }
@@ -40,10 +44,13 @@ const Product_Details = () => {
     return (
       <p className='text-3xl text-center md:text-start text-sky-700 font-semibold'>
         <span className='text-2xl'>TK. </span>
-        {book?.discountPercentage > 0 ? book?.discountPrice : book?.price}
+        {Math.round(
+          book?.discountPercentage > 0 ? book?.discountPrice : book?.price
+        )}
       </p>
     )
   }
+  console.log(book)
 
   return (
     <div className='bg-global_bg relative'>
@@ -75,7 +82,11 @@ const Product_Details = () => {
                 <div className='w-fit max-w-2/3 md:mt-0 mt-2'>
                   <div className='flex gap-2 my-1'>
                     <p>Category:</p>
-                    <span className='text-sky-700'>এইচএসসি: আবশ্যিক বিষয়</span>
+                    {book?.category?.map((cat, i) => (
+                      <span className='text-sky-700' key={i}>
+                        {cat?.name}
+                      </span>
+                    ))}
                   </div>
                   <div className='md:flex gap-2 my-2 hidden '>
                     <p>Edition:</p>
@@ -83,21 +94,23 @@ const Product_Details = () => {
                   </div>
                   <div className='hidden md:flex gap-2 my-2'>
                     <p>Country</p>
-                    <span className='text-sky-700'>Bangladesh</span>
+                    <span className='text-sky-700'>{book?.country}</span>
                   </div>
                 </div>
                 <div>
                   <div className='flex gap-2 my-2'>
                     <p>Publishers:</p>
-                    <span className='text-sky-700'>Tamaulipas</span>
+                    <span className='text-sky-700'>
+                      {book?.publisher?.name}
+                    </span>
                   </div>
                   <div className='flex gap-2 my-2'>
                     <p>Total pages:</p>
-                    <span className='text-sky-700'>288</span>
+                    <span className='text-sky-700'>{book?.pages}</span>
                   </div>
                   <div className='flex gap-2 my-2'>
                     <p>Language</p>
-                    <span className='text-sky-700'>Bangla & English</span>
+                    <span className='text-sky-700'>{book?.language}</span>
                   </div>
                 </div>
               </div>
@@ -112,25 +125,35 @@ const Product_Details = () => {
                 {book?.discountPercentage > 0 && (
                   <div className='flex items-center my-2 gap-2 text-lg'>
                     <p className='line-through text-base text-gray-500'>
-                      <span className='text-lg'>৳ </span>
+                      <span className='text-lg'>TK </span>
                       {book?.price}
                     </p>
                     <p className='bg-red-500 px-1 rounded-sm text-white'>
                       -{book?.discountPercentage}%
                     </p>
                     <p className='text-base'>
-                      You save Tk.
-                      {Math.round(
-                        (book?.price * book?.discountPercentage) / 100
-                      )}
+                      You save TK
+                      {Math.round(book?.price - book?.discountPrice)}
                     </p>
                   </div>
                 )}
               </div>
               <div className='flex md:justify-start justify-center gap-2 items-center '>
-                <TiTick className='bg-green-500 text-white rounded-full text-xl' />
-                <p>In stock</p>
-                <p className='text-sm text-black'>(Only 4 copies available)</p>
+                {book?.stock > 0 && (
+                  <TiTick className='bg-green-500 text-white rounded-full text-xl' />
+                )}
+                <p>
+                  {book?.stock > 0 ? (
+                    'In stock'
+                  ) : (
+                    <span className='text-white bg-rose-500 p-1 rounded-md px-2'>
+                      Out of Stock
+                    </span>
+                  )}
+                </p>
+                {book?.stock > 0 && (
+                  <p className='text-sm text-black'>{`(Only ${book?.stock} copies available)`}</p>
+                )}
               </div>
               <p className='w-3/4 h-[1px] mx-auto md:ml-0 bg-sky-300 my-4'></p>
               <div className='flex mx-auto md:ml-0 gap-4'>
@@ -160,31 +183,40 @@ const Product_Details = () => {
                 >
                   একটু পড়ে দেখুন
                 </button>
-                <button
-                  onClick={handleAddToCart}
-                  className='relative flex items-center gap-1 rounded border px-4 py-2 border-sky-500 bg-sky-600 transition-all duration-200 hover:bg-sky-500 text-white '
-                >
-                  <span>
-                    <IoCartOutline className='text-2xl' />
-                  </span>
-                  {cartStatus === 'loading' ? (
-                    <img
-                      className='absolute h-full w-full inset-0'
-                      src='../../../src/assets/loading-loader.gif'
-                    />
-                  ) : (
-                    'Add to Cart'
-                  )}
-                </button>
+
+                {book?.stock > 0 ? (
+                  <button
+                    onClick={handleAddToCart}
+                    className='relative flex items-center gap-1 rounded border px-4 py-2 border-sky-500 bg-sky-600 transition-all duration-200 hover:bg-sky-500 text-white '
+                  >
+                    <span>
+                      <IoCartOutline className='text-2xl' />
+                    </span>
+                    {cartStatus === 'loading' ? 'Adding...' : 'Add to Cart'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleAddToWishlist(book._id)}
+                    className='relative flex items-center gap-1 rounded border px-4 py-2 border-rose-500 bg-rose-500 transition-all duration-200 hover:bg-rose-600 text-white '
+                  >
+                    <span>
+                      <FaRegHeart className='text-xl' />
+                    </span>
+                    {cartStatus === 'loading' ? 'Adding...' : 'Add to Wishlist'}
+                  </button>
+                )}
               </div>
-              <div>
-                <p className='flex justify-center items-center gap-1 hover:text-primary transition-all border border-transparent hover:border-primary px-3 py-1 rounded-[4px] cursor-pointer text-base'>
+              {book?.stock > 0 && (
+                <p
+                  onClick={() => handleAddToWishlist(book._id)}
+                  className='flex justify-center items-center gap-1 hover:text-primary transition-all border border-transparent hover:border-primary px-3 py-1 rounded-[4px] cursor-pointer text-base'
+                >
                   <span className='mr-1'>
                     <FaRegHeart />
                   </span>
                   Add to wishlist
                 </p>
-              </div>
+              )}
             </div>
           </div>
           {/* <div className='w-1/5'> Related products code </div> */}
@@ -196,16 +228,17 @@ const Product_Details = () => {
         <p className='w-full h-8 bg-global_bg'></p>
         <SimilarProduct />
       </div>
-      {openModal && (
+      {openModal && book?.pdf && (
         <div
           className='z-50 fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'
           onClick={handleOutsideClick}
         >
-          <div
-            ref={modalRef}
-            className='bg-white p-4 rounded-lg shadow-lg relative z-10'
-          >
-            <MyDocument />
+          <div ref={modalRef} className='rounded-lg shadow-lg relative z-10'>
+            <iframe
+              src={`${book?.pdf}#toolbar=0`}
+              style={{ border: 'none' }}
+              className='h-[500px] md:h-[700px] border-none w-full md:w-[150%]'
+            ></iframe>
           </div>
         </div>
       )}

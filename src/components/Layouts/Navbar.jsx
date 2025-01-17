@@ -194,11 +194,14 @@ const Navbar = () => {
 
           {/* Logo */}
           <Link to='/'>
-            <div className='flex items-center space-x-1'>
+            <div className='flex items-center space-x-1 relative'>
               <div className='font-bold text-base sm:text-xl text-sky-600'>
                 JISANBOOK
               </div>
               <span className='text-gray-500'>.com</span>
+              <span className='text-xs text-gray-400 absolute -top-4'>
+                Beta: 1.1
+              </span>
             </div>
           </Link>
 

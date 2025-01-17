@@ -21,17 +21,17 @@ const ProductCard = ({ book, rating = 4, className }) => {
   const calculatePrice = () => {
     if (book?.discountPercentage > 0) {
       return (
-        <p className='text-gray-900 text-lg font-semibold'>{`TK ${book?.discountPrice}`}</p>
+        <p className='text-gray-900 text-md md:text-lg font-semibold'>{`TK ${book?.discountPrice}`}</p>
       )
     }
     return (
-      <p className='text-gray-900 text-lg font-semibold'>{`TK ${book?.price}`}</p>
+      <p className='text-gray-900 text-md md:text-lg font-semibold'>{`TK ${book?.price}`}</p>
     )
   }
 
   return (
     <div
-      className={`bg-white rounded-md p-2 w-1/2 max-w-60 min-w-44 sm:w-52 border cursor-pointer group relative ${className}`}
+      className={`bg-white rounded-md p-2 basis-1/2 max-w-60 min-w-44 sm:w-52 border cursor-pointer group relative ${className}`}
     >
       <Link to={`/book/${book?._id}`}>
         <div className=' bg-sky-50 hover:shadow-md h-36 overflow-hidden relative'>
@@ -86,17 +86,17 @@ const ProductCard = ({ book, rating = 4, className }) => {
         </div>
       </Link>
       {/* Hover Buttons */}
-      <div className='absolute top-[120px] w-[calc(100%-16px)] left-2 flex items-end justify-center  opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-[0px_-5px_60px_-5px_rgba(0,0,0,0.6)]'>
+      <div className='md:absolute top-[120px] md:w-[calc(100%-16px)] left-2 flex items-end justify-center  md:opacity-0 my-2 group-hover:opacity-100 transition-opacity duration-300 shadow-[0px_-5px_60px_-5px_rgba(0,0,0,0.6)]'>
         <button
           onClick={handleAddToWishlist}
-          className='p-2 bg-white w-full shadow-md hover:bg-red-500 hover:text-white transition-all'
+          className='p-2 bg-white w-full shadow-md md:hover:bg-red-500 active:bg-red-500 md:hover:text-white transition-all'
           title='Add to Wishlist'
         >
           <FiHeart size={18} className='mx-auto' />
         </button>
         <button
           onClick={handleAddToCart}
-          className='p-2 bg-white w-full shadow-md hover:bg-sky-500 hover:text-white transition-all'
+          className='p-2 bg-white w-full shadow-md active:bg-sky-500 md:hover:bg-sky-500 md:hover:text-white transition-all'
           title='Add to Cart'
         >
           <FiShoppingCart size={18} className='mx-auto' />

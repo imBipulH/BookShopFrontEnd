@@ -55,6 +55,8 @@ const CartItems = React.memo(({ item, handleDelete }) => {
       </p>
     )
   }
+  console.log(item)
+
   return (
     <div className='flex h-fit flex-1 gap-2 md:gap-4 p-2 md:px-8 border-b border-b-primary bg-sky-50 py-2 shadow-xl'>
       <input
@@ -75,27 +77,32 @@ const CartItems = React.memo(({ item, handleDelete }) => {
         <h2 className='text-sm md:text-xl'>{item?.productId?.title}</h2>
         <span className='text-xs md:text-md text-black inline mr-1'>by</span>
         <p className='text-xs md:text-base text-primary cursor-pointer inline'>
-          Ashwini Shankar
+          {item?.productId?.author?.name}
         </p>
         <div className='flex items-center gap-2 text-base'>
           <p className='text-xs md:text-md'>Category: </p>
           <p className='text-xs md:text-md text-primary cursor-pointer'>
-            English Books
+            {item?.productId?.category[0]?.name}
           </p>
         </div>
         <div className='flex flex-wrap sm:gap-2 items-center '>
-          <div className='flex items-center gap-2'>
-            <TiTick className='bg-green-500 text-white rounded-full text-base' />
+          <div className='flex items-center md:gap-2'>
+            <TiTick className=' text-white rounded-full text-base' />
             <p>In stock</p>
           </div>
-          <p className='text-sm text-black'>(Only 4 copies available)</p>
+          <p className='text-sm text-black'>{`(Only ${item?.productId?.stock} copies available)`}</p>
         </div>
-        <div className='flex gap-1 sm:gap-2 mt-2 items-center'>
-          <FaRegTrashAlt
-            onClick={handleDelete}
-            className='text-sm md:text-3xl hover:text-red-500 hover:bg-red-200 rounded-md md:p-1.5 transition-all duration-200 cursor-pointer'
-          />
-          <FaRegHeart className=' md:text-3xl rounded-md mr-2 cursor-pointer hover:bg-sky-200 md:p-1.5 transition-all duration-200 hover:text-primary' />
+        <div className='flex gap-2 mt-2 items-center'>
+          <div className='p-2 active:text-red-500 active:bg-red-200 md:hover:text-red-500 md:hover:bg-red-200 rounded-sm transition-all duration-200 cursor-pointer'>
+            <FaRegTrashAlt
+              onClick={handleDelete}
+              className='text-sm md:text-2xl  rounded-md '
+            />
+          </div>
+          <div className='p-2 mr-2 rounded-sm cursor-pointer active:bg-sky-200 active:text-primary md:hover:bg-sky-200 transition-all duration-200 md:hover:text-primary'>
+            <FaRegHeart className='text-sm md:text-2xl ' />
+          </div>
+
           <div className='flex gap-2 items-center'>
             <button
               onClick={() => handleQuantityChange(item, 'minus')}
@@ -192,14 +199,15 @@ const Cart = () => {
     return cart?.filter(item => item.isMarked).length > 0 ? baseFee : 0
   }
 
-  const subtotal = calculateSubtotal()
+  const subtotal = Math.round(calculateSubtotal())
   const shippingFee = calculateShippingFee()
   const discountAmount = calculateDiscountAmount()
   const MRP = calculateMRP()
+
   console.log('MRP: ', MRP)
   console.log('discountAmount: ', discountAmount)
 
-  const totalAmount = subtotal + shippingFee
+  const totalAmount = Math.round(subtotal + shippingFee)
   return (
     <div className='bg-global_bg pt-28 md:pt-40 pb-8'>
       <div className='container'>

@@ -7,9 +7,9 @@ import {
 } from './cartUtils'
 
 const CheckoutSummery = ({ cart }) => {
-  const subtotal = calculateSubtotal(cart)
+  const subtotal = Math.round(calculateSubtotal(cart))
   const shippingFee = calculateShippingFee(cart)
-  const totalAmount = calculateTotalAmount(subtotal, shippingFee)
+  const totalAmount = Math.round(calculateTotalAmount(subtotal, shippingFee))
 
   return (
     <div className=' md:w-1/3 h-fit shadow-xl px-6 py-4 bg-white'>

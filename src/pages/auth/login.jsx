@@ -88,9 +88,9 @@ const Login = () => {
 
   return (
     <div className=''>
-      <div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-300 md:mt-[100px]'>
+      <div className='flex md:h-screen items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-300 md:mt-[100px]'>
         <motion.div
-          className='w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg'
+          className='w-full max-w-md px-4 pb-4 md:pt-8 pt-28 space-y-4 bg-white rounded-lg shadow-lg'
           initial='hidden'
           animate='visible'
           variants={containerVariants}

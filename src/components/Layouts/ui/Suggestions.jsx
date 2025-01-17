@@ -12,7 +12,7 @@ const Suggestions = ({ book }) => {
   const navigate = useNavigate()
   const { cart } = useSelector(state => state?.cart)
 
-  const isInCart = cart.some(item => item.productId._id == book?._id)
+  const isInCart = cart.some(item => item?.productId?._id == book?._id)
 
   const handleSuggestionClick = book => {
     dispatch(clearSuggestions())
@@ -23,26 +23,49 @@ const Suggestions = ({ book }) => {
     dispatch(addToCart({ productId: book._id, quantity: 1 }))
   }
 
+  const calculatePrice = () => {
+    if (book?.discountPercentage > 0) {
+      return (
+        <span className='text-gray-900 text-sm md:text-md font-semibold'>{`TK ${book?.discountPrice}`}</span>
+      )
+    }
+    return (
+      <span className='text-gray-900 text-sm md:text-md font-semibold'>{`TK ${book?.price}`}</span>
+    )
+  }
+
   return (
     <li
       key={book?._id}
       className='flex justify-between items-center px-1 hover:bg-gray-100'
     >
       <div
-        className='flex items-center gap-2 px-4 py-2  cursor-pointer'
+        className='flex w-full justify-between items-center gap-2 p-2  cursor-pointer'
         onClick={() => handleSuggestionClick(book)}
       >
         {book.coverImage ? (
           <img
             src={book.coverImage}
             alt={book.title}
-            className='w-12 h-12 rounded-md object-cover'
+            className='w-12 aspect-square rounded-md object-cover'
           />
         ) : (
-          <span className='w-12 h-12 rounded-md bg-gray-400'></span>
+          <span className='w-12 aspect-square rounded-md bg-gray-400'></span>
         )}
-        {book.title} - {book._id} - {book.author.name} -{' '}
-        {book.category[0]?.name} -{book.price} - {book?.discountPercentage}
+        <div className='flex justify-between items-center w-full'>
+          <div className='flex flex-col'>
+            <span> {book?.title}</span>
+            <span className='text-sm text-start'>by {book?.author?.name} </span>
+          </div>
+          <div className='text-xs md:text-sm  min-w-fit'>
+            {book?.discountPercentage > 0 && (
+              <span className='line-through text-gray-400'>
+                TK{book?.price}
+              </span>
+            )}{' '}
+            {calculatePrice()}
+          </div>
+        </div>
       </div>
 
       {isInCart ? (

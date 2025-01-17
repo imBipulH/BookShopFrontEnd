@@ -36,6 +36,18 @@ const Category = () => {
     )
   })
 
+  useEffect(() => {
+    const storedFilters = JSON.parse(sessionStorage.getItem('filters')) || {
+      categories: [],
+      authors: [],
+      publishers: [],
+      languages: [],
+      sort: null,
+      sortOrder: null
+    }
+    setFilters(storedFilters)
+  }, [id, type]) // Sync on category/type change
+
   const [range, setRange] = useState({ start: 1, end: itemsPerPage })
 
   console.log('Category page Rendering..')
@@ -54,13 +66,14 @@ const Category = () => {
     limit: itemsPerPage,
     [type]: id ? [id] : filters[type]
   }
-  sessionStorage.setItem('filters', JSON.stringify(updatedFilters))
 
   const fetchBooksWithPagination = () => {
     const queryParams = new URLSearchParams(updatedFilters).toString()
     console.log('Query Parameters:', queryParams)
     dispatch(fetchBooks(queryParams))
   }
+
+  sessionStorage.setItem('filters', JSON.stringify(updatedFilters))
 
   useEffect(() => {
     fetchBooksWithPagination()
@@ -263,7 +276,7 @@ const Category = () => {
               </div>
 
               {/* Products Grid */}
-              <div className='grid grid-cols-2 gap-2 sm:flex flex-wrap justify-items-center md:gap-4 mt-2 md:mt-8'>
+              <div className='grid grid-cols-2 gap-y-4 sm:flex flex-wrap justify-items-center md:gap-4 mt-2 md:mt-8'>
                 {books.data &&
                   books.data.map((book, i) => (
                     <ProductCard key={i} book={book} />

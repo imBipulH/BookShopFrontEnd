@@ -104,7 +104,7 @@ const Home = () => {
   return (
     <div className='bg-white'>
       <div className='container bg-white'>
-        <div className='pt-8 md:pt-44 '>
+        <div className='pt-24 md:pt-44 '>
           <BannerSlider />
           <div className='md:bg-sky-500 grid grid-cols-3 md:grid-cols-6 rounded-xl'>
             {HomePageSixCategory.map(category => (

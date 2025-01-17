@@ -1,7 +1,8 @@
 // Create Document Component
-export const MyDocument = () => (
+
+export const MyDocument = pdfSrc => (
   <iframe
-    src='../../../src/assets/Getting started with OneDrive.pdf'
+    src={`${pdfSrc}#toolbar=0`}
     width='200%'
     height='800px'
     style={{ border: 'none' }}

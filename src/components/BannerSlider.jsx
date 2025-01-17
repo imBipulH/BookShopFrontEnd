@@ -3,8 +3,8 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { useCallback, useEffect, useState } from 'react'
 import { LeftArrow, RightArrow } from './ui/LeftArrow'
 import Banner1 from '../../src/assets/banner1.jpg'
-import Banner2 from '../../src/assets/banner2.png'
-import Banner3 from '../../src/assets/banner3.png'
+import Banner2 from '../../src/assets/banner2.jpg'
+import Banner3 from '../../src/assets/banner3.jpg'
 
 export default function EmblaCarousel () {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
@@ -44,13 +44,13 @@ export default function EmblaCarousel () {
     <>
       <div className='embla relative my-4' ref={emblaRef}>
         <div className='embla__container'>
-          <div className='embla__slide border border-red-300 h-60 flex items-center justify-center'>
+          <div className='embla__slide border  md:h-60 flex items-center justify-center'>
             <img src={Banner1} />
           </div>
-          <div className='embla__slide border border-red-300 h-60 flex items-center justify-center'>
+          <div className='embla__slide border  md:h-60 flex items-center justify-center'>
             <img src={Banner2} />
           </div>
-          <div className='embla__slide border border-red-300 h-60 flex items-center justify-center'>
+          <div className='embla__slide border  md:h-60 flex items-center justify-center'>
             <img src={Banner3} />
           </div>
         </div>
